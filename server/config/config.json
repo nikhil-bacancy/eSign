@@ -1,0 +1,8 @@
+{
+    "development" : {
+        "username": "niraj",
+        "password": "",
+        "database": "esigndb",
+        "use_env_variable": ""
+    }
+}

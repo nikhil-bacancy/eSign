@@ -15,6 +15,7 @@ let pageConfig = {
 exports.uploadFile = function (req,res) {
   try {
     const data = new Uint8Array(Buffer.from(req.files.docFile.data));
+    console.log("TCL: exports.uploadFile -> req.files", req.files)
     fs.writeFile('message.pdf', data, (err) => {
       if(err) {
         return res.status(500).json({
