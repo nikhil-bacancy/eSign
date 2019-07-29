@@ -1,5 +1,7 @@
 const DocModifier = require('../utils/test');
-const fs = require('fs');
+const db = require('../models/index');
+
+const documents = db.documents;
 
 let pageConfig = {
   PAGE_NUM : 0,
@@ -12,24 +14,17 @@ let pageConfig = {
   PDF_DOC : ''
 };
 
-exports.uploadFile = function (req,res) {
+
+exports.uploadFile = async function (req,res) {
+  let file;
   try {
-    const data = new Uint8Array(Buffer.from(req.files.docFile.data));
-    console.log("TCL: exports.uploadFile -> req.files", req.files)
-    fs.writeFile('message.pdf', data, (err) => {
-      if(err) {
-        return res.status(500).json({
-          status: false,
-          message: 'file_uploading_error',
-          details: err,
-        });
-      }else{
-        return res.status(200).json({
-          status: false,
-          message: 'The file has been saved!',
-          details: 'The file has been saved!',
-        });
-      }
+    file = await documents.create({
+      name: req.file.filename,
+      path: req.file.destination,
+      docType: req.file.mimetype,
+      totalPages: req.body.totalPages,
+      statusID :  1, // panding 
+      statusDate: Date.now(),
     });
   } catch (error) {
     return res.status(500).json({
@@ -38,7 +33,11 @@ exports.uploadFile = function (req,res) {
       details: error,
     });
   }
-
+  return res.status(200).json({
+    status: true,
+    message: 'Document information stored successfully.',
+    data: file,
+  });
 }
 
 exports.sendDoc = function (req, res) {

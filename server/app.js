@@ -1,14 +1,24 @@
-const express = require('express');
-const port = 8000;
-const app = express();
 const chalk = require('chalk');
+const express = require('express');
+const expressValidator = require('express-validator');
+const fs = require('fs');
 const bodyParser = require('body-parser');
+// const fileUpload = require('express-fileupload');
 const glob = require('glob');
-const fileUpload = require('express-fileupload');
+const app = express();
+require('./models/')
 
+// Load environment variables.
+require('dotenv').config();
+
+eval(fs.readFileSync(`${__dirname}/models/index.js`));
+
+app.use(expressValidator());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({ limit: '50mb' }));
-app.use(fileUpload());
+// app.use(fileUpload());
+app.use('/', express.static('./public'));
+app.set('view engine', 'ejs');
 
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
@@ -33,7 +43,6 @@ const initRoutes = (app) => {
   
 initRoutes(app);
   
-app.listen(port || 3001, () => {
-    console.log(chalk.blue('App listening on port',port));
+app.listen(process.env.PORT || 3001, () => {
+  console.log(chalk.blue('App listening on port',process.env.PORT));
 });
-  

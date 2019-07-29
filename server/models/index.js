@@ -1,4 +1,3 @@
-
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
@@ -7,12 +6,24 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
+
 let sequelize;
 if (config.use_env_variable) {
+  console.log('ifff');
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
+  console.log('else');
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
+
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
 
 fs
   .readdirSync(__dirname)
@@ -33,38 +44,40 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-db.college_courses.belongsTo(db.colleges);
-db.college_courses.belongsTo(db.courses);
+db.documents.belongsTo(db.status);
+db.status.hasMany(db.documents);
 
-db.feedbacks.belongsTo(db.candidates);
-db.candidates.belongsTo(db.colleges);
+// db.college_courses.belongsTo(db.courses);
 
-db.candidates.hasMany(db.feedbacks);
-db.colleges.hasMany(db.candidates);
+// db.feedbacks.belongsTo(db.candidates);
+// db.candidates.belongsTo(db.colleges);
 
-db.mcq_set_mcqs.belongsTo(db.mcqs);
-db.mcq_set_mcqs.belongsTo(db.mcq_sets);
+// db.candidates.hasMany(db.feedbacks);
+// db.colleges.hasMany(db.candidates);
 
-db.mcq_sets.belongsToMany(db.mcqs, {
-  through  : db.mcq_set_mcqs,
-    foreignKey: 'mcqSetId',
-    otherKey: 'mcqId',
-    as: 'questions'
-})
+// db.mcq_set_mcqs.belongsTo(db.mcqs);
+// db.mcq_set_mcqs.belongsTo(db.mcq_sets);
 
-db.mcqs.belongsToMany(db.mcq_set_mcqs, {
-  through  : db.mcq_set_mcqs,
-  foreignKey: 'mcqId',
-    otherKey: 'mcqSetId',
-    as: 'sets'
-})
+// db.mcq_sets.belongsToMany(db.mcqs, {
+//   through  : db.mcq_set_mcqs,
+//     foreignKey: 'mcqSetId',
+//     otherKey: 'mcqId',
+//     as: 'questions'
+// })
 
-db.problem_set_problem_definitions.belongsTo(db.problem_definitions);
-db.mcq_answers.belongsTo(db.mcqs);
-db.candidate_assigned_sets.belongsTo(db.mcq_sets);
-db.candidate_assigned_sets.belongsTo(db.problem_sets);
-db.candidate_assigned_sets.belongsTo(db.candidates);
+// db.mcqs.belongsToMany(db.mcq_set_mcqs, {
+//   through  : db.mcq_set_mcqs,
+//   foreignKey: 'mcqId',
+//     otherKey: 'mcqSetId',
+//     as: 'sets'
+// })
 
-db.problem_solutions.belongsTo(db.problem_definitions ,{as: 'ProblemDef', foreignKey: 'problemId'});
+// db.problem_set_problem_definitions.belongsTo(db.problem_definitions);
+// db.mcq_answers.belongsTo(db.mcqs);
+// db.candidate_assigned_sets.belongsTo(db.mcq_sets);
+// db.candidate_assigned_sets.belongsTo(db.problem_sets);
+// db.candidate_assigned_sets.belongsTo(db.candidates);
+
+// db.problem_solutions.belongsTo(db.problem_definitions ,{as: 'ProblemDef', foreignKey: 'problemId'});
 
 module.exports = db;
