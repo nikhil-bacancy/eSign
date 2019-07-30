@@ -1,10 +1,10 @@
 module.exports = (sequelize, DataTypes) => {
   const doc_signs = sequelize.define('doc_signs', {
-    documentID: DataTypes.INTEGER,
-    organizationID: DataTypes.INTEGER,
-    creatorID: DataTypes.INTEGER,
-    recipientID: DataTypes.INTEGER,
-    statusID: DataTypes.INTEGER,
+    documentId: DataTypes.INTEGER,
+    organizationId: DataTypes.INTEGER,
+    creatorId: DataTypes.INTEGER,
+    recipientId: DataTypes.INTEGER,
+    statusId: DataTypes.INTEGER,
     statusDate: DataTypes.DATE,
   }, {});
   doc_signs.associate = function(models) {

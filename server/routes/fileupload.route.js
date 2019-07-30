@@ -1,4 +1,4 @@
-const pdftohtmlControllers = require('../controllers/pdftohtml.controller.js');
+const fileuploadControllers = require('../controllers/fileupload.controller.js');
 const multer  = require('multer');
 const path = require('path');
 const uploadFilePath = path.normalize( __dirname + '/../upload/');
@@ -13,7 +13,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage }).single('docFile')
 
 const routes = (app) => {  
-  app.post('/pdftohtml/',pdftohtmlControllers.sendDoc);
+  app.post('/pdftohtml/',fileuploadControllers.sendDoc);
 
   app.post('/uploadfile/',(req, res)  => {
     upload(req,res,(err) => {
@@ -24,7 +24,7 @@ const routes = (app) => {
           details: 'error found in uploading!',
         });
       }else{
-        return pdftohtmlControllers.uploadFile(req,res);
+        return fileuploadControllers.uploadFile(req,res);
       }
     })
   }); 

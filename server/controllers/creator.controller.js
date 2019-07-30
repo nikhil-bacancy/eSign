@@ -5,11 +5,21 @@ const creators = db.creators;
 exports.create = async function (req,res) {
   let creator;
   try {
-    creator = await creators.create({
-      name: req.body.name,
-      phoneNumber: req.body.phoneNumber,
-      email: req.body.email,
-    });
+    await creators.findOrCreate({
+      where: {email: req.body.email},
+      defaults: {
+          name: req.body.name,
+          phoneNumber: req.body.phoneNumber,
+          email: req.body.email,
+      }
+    }).then(([user,created])=>{
+      creator = user; 
+      return res.status(200).json({
+        status: created,
+        message:  created ? 'Sender information stored successfully.' : 'Sender data already exist.',
+        data: creator,
+      });
+    })
   } catch (error) {
     return res.status(500).json({
       status: false,
@@ -17,9 +27,5 @@ exports.create = async function (req,res) {
       details: error,
     });
   }
-  return res.status(200).json({
-    status: true,
-    message: 'Sender information stored successfully.',
-    data: creator,
-  });
+  
 }

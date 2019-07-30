@@ -18,13 +18,23 @@ let pageConfig = {
 exports.uploadFile = async function (req,res) {
   let file;
   try {
-    file = await documents.create({
-      name: req.file.filename,
-      path: req.file.destination,
-      docType: req.file.mimetype,
-      totalPages: req.body.totalPages,
-      statusID :  1, // panding 
-      statusDate: Date.now(),
+    await documents.findOrCreate({
+      where: { name: req.file.filename },
+      defaults: {
+        name: req.file.filename,
+        path: req.file.destination,
+        docType: req.file.mimetype,
+        totalPages: req.body.totalPages,
+        statusId: 1, // panding 
+        statusDate: Date.now(),
+      }
+    }).then(([data,created])=>{
+      file = data; 
+      return res.status(200).json({
+        status: created,
+        message:  created ? 'Document information stored successfully.' : 'Document data already exist.',
+        data: file,
+      });
     });
   } catch (error) {
     return res.status(500).json({
@@ -33,11 +43,6 @@ exports.uploadFile = async function (req,res) {
       details: error,
     });
   }
-  return res.status(200).json({
-    status: true,
-    message: 'Document information stored successfully.',
-    data: file,
-  });
 }
 
 exports.sendDoc = function (req, res) {

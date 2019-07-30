@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     path: DataTypes.TEXT,
     docType: DataTypes.STRING,
     totalPages: DataTypes.INTEGER,
-    statusID: DataTypes.INTEGER,
+    statusId: DataTypes.INTEGER,
     statusDate: DataTypes.DATE,
   }, {});
   documents.associate = function(models) {

@@ -24,7 +24,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
-      statusID: {
+      statusId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {

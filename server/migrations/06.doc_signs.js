@@ -8,7 +8,7 @@ module.exports = {
                 primaryKey: true,
                 type: Sequelize.INTEGER
             },
-            documentID: {
+            documentId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 references: {
@@ -16,7 +16,7 @@ module.exports = {
                     key: 'id'
                 }
             },
-            organizationID: {
+            organizationId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 references: {
@@ -24,7 +24,7 @@ module.exports = {
                     key: 'id',
                 }
             },
-            creatorID: {
+            creatorId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 references: {
@@ -32,7 +32,7 @@ module.exports = {
                     key: 'id'
                 }
             },
-            recipientID: {
+            recipientId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 references: {
@@ -40,7 +40,7 @@ module.exports = {
                     key: 'id'
                 }
             },
-            statusID: {
+            statusId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 references: {

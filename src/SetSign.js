@@ -1,50 +1,85 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { CustomInput, Form, FormGroup, Label, Col, Row, Input, Button } from 'reactstrap';
+import Select from "react-select";
+import { Form, FormGroup, Label, Col, Row, Button } from 'reactstrap';
+
 export default class SetSign extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      numPages: null, pageNumber: 1, file: '', file2: '',
+      seletedRecipients: null,
+      recipientList: [],
+      selecteOptions: [],
       imagePreviewUrl: '',
+      pdfPreviewUrls: [],
       divPos: [],
       signPos: [],
-      sender: {
-        name: 'nikhil',
-        email: 'nikhil.patel@bacancytechnology.com',
-        docFile: '',
-      }
+      docId: 1,
+      doc_signs_data : []
     };
   }
 
-  formdataCoverter(payload) {
-    let formdata = new FormData();
-    for (let k in payload) {
-      if (k === "pdf" || k === 'sign' || k === 'docFile') {
-        formdata.append(k, payload[k], k);
-      } else {
-        formdata.append(k, payload[k]);
-      }
-    }
-    return formdata;
+  componentDidMount = () => {
+    axios.get('http://localhost:8000/getRecipientList/')
+    .then((response) => {
+      let {selecteOptions,recipientList} = this.state;
+      recipientList = response.data.data
+      selecteOptions = response.data.data.map(({ id, name }) => {
+          let value = id;
+          let label = name;
+          return { value, label };
+      });
+      this.setState({recipientList, selecteOptions})
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+    this.onLoadPdf();
   }
 
-  onuploadFile = () => {
-    const payload = {
-      senderName: this.state.sender.name,
-      senderEmail: this.state.sender.email,
-      docFile: this.state.sender.docFile,
-    }
-    if (payload.docFile) {
-      axios.post('http://localhost:8000/uploadfile/', this.formdataCoverter(payload))
-        .then((response) => {
-          this.setState({ levels: 1 })
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    }
+  onLoadPdf = () => {
+    axios.get(`http://localhost:8000/getDoc/${this.state.docId}`)
+    .then((response) => {
+      if(response.data.data){
+        this.setState({ imagePreviewUrl: response.data.data })
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   }
+
+  onsetDocSign = () => {
+    axios.post('http://localhost:8000/docsing/',this.state.doc_signs_data)
+    .then((response) => {
+       
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }
+  
+  formdataCoverter(payload) {
+    let formdata = new FormData();
+    for (let k in payload)
+        formdata.append(k, payload[k]);
+    return formdata;
+  }
+  
+  handleChange = selectedOption => {
+    let { seletedRecipients,doc_signs_data } = this.state;
+    seletedRecipients = selectedOption;
+    if(seletedRecipients){
+      doc_signs_data = selectedOption.map(({ value }) => {
+          let documentId = 1 , organizationId = 1, creatorId = 1 , recipientId = value;
+          let statusId = 1 , statusDate = Date.now();
+          return { documentId, organizationId, creatorId, recipientId, statusId, statusDate };
+      });
+    }else{
+      doc_signs_data = []
+    }
+     this.setState({ seletedRecipients,doc_signs_data });
+  };
 
   onSendFile = () => {
     const payload = {
@@ -57,15 +92,7 @@ export default class SetSign extends Component {
       pdf: this.state.file,
       sign: this.state.file2,
     }
-    let formdata = new FormData();
-    for (let k in payload) {
-      if (k === "pdf" || k === 'sign') {
-        formdata.append(k, payload[k], k);
-      } else {
-        formdata.append(k, payload[k]);
-      }
-    }
-    axios.post('http://localhost:8000/pdftohtml/', formdata)
+    axios.post('http://localhost:8000/pdftohtml/', this.formdataCoverter(payload))
       .then(function (response) {
         console.log(response);
       })
@@ -74,71 +101,53 @@ export default class SetSign extends Component {
       });
   }
 
-  onDocumentLoadSuccess = ({ numPages }) => {
-    this.setState({ numPages });
-  };
-
-  goToPrevPage = () =>
-    this.setState(state => ({ pageNumber: state.pageNumber - 1 }));
-
-  goToNextPage = () =>
-    this.setState(state => ({ pageNumber: state.pageNumber + 1 }));
-
-  handleChange(event) {
-    let sender = this.state.sender
-    sender.docFile = event.target.files[0];
-    this.setState({ file: event.target.files[0], sender })
+  setImages = () => {
+    return this.state.imagePreviewUrl.map((img,index) => <img width='100%' border="5" height='100%' key={index+1} src={'http://localhost:8000/upload/' + img} alt={index+1} />)
   }
 
-  handleChange2(event) {
-    this.setState({ file2: event.target.files[0] })
-  }
+  // getCords = () => {
+  //   this.setState({
+  //     divPos: this.getPositionXY(),
+  //     signPos: this.getPositionXYSign()
+  //   })
+  // }
 
-  getCords = () => {
-    this.setState({
-      divPos: this.getPositionXY(),
-      signPos: this.getPositionXYSign()
-    })
-  }
+  // getPositionXY = (event) => {
+  //   var element = document.getElementById('docPage');
+  //   var rect = element.getBoundingClientRect();
+  //   document.getElementById('divpos').innerText = rect.x + ',' + rect.y
+  //   return [rect.x, rect.y];
+  // }
 
-  getPositionXY = (event) => {
-    var element = document.getElementById('docPage');
-    var rect = element.getBoundingClientRect();
-    document.getElementById('divpos').innerText = rect.x + ',' + rect.y
-    return [rect.x, rect.y];
-  }
-
-  getPositionXYSign = (onStopEventXYvalue) => {
-    var element = document.getElementById('sign');
-    var rect = element.getBoundingClientRect();
-    document.getElementById('signpos').innerText = rect.x + ',' + rect.y
-    return [rect.x, rect.y]
-  }
+  // getPositionXYSign = (onStopEventXYvalue) => {
+  //   var element = document.getElementById('sign');
+  //   var rect = element.getBoundingClientRect();
+  //   document.getElementById('signpos').innerText = rect.x + ',' + rect.y
+  //   return [rect.x, rect.y]
+  // }
 
   render() {
-    // const { pageNumber, numPages } = this.state;
-
+    const { seletedRecipients, selecteOptions, imagePreviewUrl } = this.state;
     return (
       <>
         <Form className='m-5'>
           <Row form>
             <Col md={6}>
               <FormGroup>
-                <Label for="exampleCustomSelect">Custom Select : </Label>
-                <CustomInput type="select" id="exampleCustomSelect" name="customSelect">
-                  <option value="">Select</option>
-                  <option>Value 1</option>
-                  <option>Value 2</option>
-                  <option>Value 3</option>
-                  <option>Value 4</option>
-                  <option>Value 5</option>
-                </CustomInput>
+                <Label>Select Recipient: </Label>
+                <Select
+                      isMulti
+                      isSearchable
+                      value={seletedRecipients}
+                      onChange={this.handleChange}
+                      options={selecteOptions}
+                    />
               </FormGroup>
             </Col>
             <Col md={6}>
+              <Label>Set Doc Sign : </Label>
               <FormGroup>
-                <Label for="examplePassword">Password</Label>
-                <Input type="password" name="password" id="examplePassword" placeholder="password placeholder" />
+                <Button onClick={this.onsetDocSign} > Add Details </Button>
               </FormGroup>
             </Col>
           </Row>
@@ -160,17 +169,20 @@ export default class SetSign extends Component {
           </Row>
           <Button onClick={this.onSendFile} >Send File</Button>
           <Row form>
-            <Col md={5}></Col>
-            <Col md={2}>
-              <Label size="lg" className='align'> File Viewer</Label>
+            <Col md={12}>
+              <center><Label size="lg" className='align'> File Viewer</Label></center>
             </Col>
-            <Col md={5}></Col>
           </Row>
           <Row form>
             <Col md={2}></Col>
             <Col md={8}>
-              <div id="docPage" style={{ minWidth: '100%', border: '1px solid black', background: 'red' }}>
-
+              <div id="docPage" style={{  border: '1px solid black' }}>
+                  {
+                    imagePreviewUrl.length &&
+                    <center>  
+                      {this.setImages()}
+                    </center>
+                  }
               </div>
             </Col>
             <Col md={2}></Col>

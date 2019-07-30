@@ -47,7 +47,16 @@ db.Sequelize = Sequelize;
 db.documents.belongsTo(db.status);
 db.status.hasMany(db.documents);
 
-// db.college_courses.belongsTo(db.courses);
+db.doc_signs.belongsTo(db.documents);
+db.documents.hasMany(db.doc_signs);
+db.doc_signs.belongsTo(db.organizations);
+db.organizations.hasMany(db.doc_signs);
+db.doc_signs.belongsTo(db.creators);
+db.creators.hasMany(db.doc_signs);
+db.doc_signs.belongsTo(db.recipients);
+db.recipients.hasMany(db.doc_signs);
+db.doc_signs.belongsTo(db.status);
+db.status.hasMany(db.doc_signs);
 
 // db.feedbacks.belongsTo(db.candidates);
 // db.candidates.belongsTo(db.colleges);
