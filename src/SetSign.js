@@ -15,70 +15,70 @@ export default class SetSign extends Component {
       divPos: [],
       signPos: [],
       docId: 1,
-      doc_signs_data : []
+      doc_signs_data: []
     };
   }
 
   componentDidMount = () => {
     axios.get('http://localhost:8000/getRecipientList/')
-    .then((response) => {
-      let {selecteOptions,recipientList} = this.state;
-      recipientList = response.data.data
-      selecteOptions = response.data.data.map(({ id, name }) => {
+      .then((response) => {
+        let { selecteOptions, recipientList } = this.state;
+        recipientList = response.data.data
+        selecteOptions = response.data.data.map(({ id, name }) => {
           let value = id;
           let label = name;
           return { value, label };
+        });
+        this.setState({ recipientList, selecteOptions })
+      })
+      .catch((error) => {
+        console.log(error);
       });
-      this.setState({recipientList, selecteOptions})
-    })
-    .catch((error) => {
-      console.log(error);
-    });
     this.onLoadPdf();
   }
 
   onLoadPdf = () => {
     axios.get(`http://localhost:8000/getDoc/${this.state.docId}`)
-    .then((response) => {
-      if(response.data.data){
-        this.setState({ imagePreviewUrl: response.data.data })
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+      .then((response) => {
+        if (response.data.data) {
+          this.setState({ imagePreviewUrl: response.data.data })
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   onsetDocSign = () => {
-    axios.post('http://localhost:8000/docsing/',this.state.doc_signs_data)
-    .then((response) => {
-       
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+    axios.post('http://localhost:8000/docsing/', this.state.doc_signs_data)
+      .then((response) => {
+
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
-  
+
   formdataCoverter(payload) {
     let formdata = new FormData();
     for (let k in payload)
-        formdata.append(k, payload[k]);
+      formdata.append(k, payload[k]);
     return formdata;
   }
-  
+
   handleChange = selectedOption => {
-    let { seletedRecipients,doc_signs_data } = this.state;
+    let { seletedRecipients, doc_signs_data } = this.state;
     seletedRecipients = selectedOption;
-    if(seletedRecipients){
+    if (seletedRecipients) {
       doc_signs_data = selectedOption.map(({ value }) => {
-          let documentId = 1 , organizationId = 1, creatorId = 1 , recipientId = value;
-          let statusId = 1 , statusDate = Date.now();
-          return { documentId, organizationId, creatorId, recipientId, statusId, statusDate };
+        let documentId = 1, organizationId = 1, creatorId = 1, recipientId = value;
+        let statusId = 1, statusDate = Date.now();
+        return { documentId, organizationId, creatorId, recipientId, statusId, statusDate };
       });
-    }else{
+    } else {
       doc_signs_data = []
     }
-     this.setState({ seletedRecipients,doc_signs_data });
+    this.setState({ seletedRecipients, doc_signs_data });
   };
 
   onSendFile = () => {
@@ -102,7 +102,7 @@ export default class SetSign extends Component {
   }
 
   setImages = () => {
-    return this.state.imagePreviewUrl.map((img,index) => <img width='100%' border="5" height='100%' key={index+1} src={'http://localhost:8000/upload/' + img} alt={index+1} />)
+    return this.state.imagePreviewUrl.map((img, index) => <div className='d-flex mt-3 bg-secondary'> <img width='100%' height='100%' key={index + 1} src={'http://localhost:8000/upload/' + img} alt={index + 1} /></div>)
   }
 
   // getCords = () => {
@@ -136,12 +136,12 @@ export default class SetSign extends Component {
               <FormGroup>
                 <Label>Select Recipient: </Label>
                 <Select
-                      isMulti
-                      isSearchable
-                      value={seletedRecipients}
-                      onChange={this.handleChange}
-                      options={selecteOptions}
-                    />
+                  isMulti
+                  isSearchable
+                  value={seletedRecipients}
+                  onChange={this.handleChange}
+                  options={selecteOptions}
+                />
               </FormGroup>
             </Col>
             <Col md={6}>
@@ -176,13 +176,13 @@ export default class SetSign extends Component {
           <Row form>
             <Col md={2}></Col>
             <Col md={8}>
-              <div id="docPage" style={{  border: '1px solid black' }}>
-                  {
-                    imagePreviewUrl.length &&
-                    <center>  
-                      {this.setImages()}
-                    </center>
-                  }
+              <div id="docPage">
+                {
+                  imagePreviewUrl.length &&
+                  <center>
+                    {this.setImages()}
+                  </center>
+                }
               </div>
             </Col>
             <Col md={2}></Col>
