@@ -1,0 +1,30 @@
+.source{
+    width: 5%;
+    border-right: 1px solid #eee;
+    min-height: 100vh;
+}
+.source ul{
+    width: 100%;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.source ul li{
+    cursor: pointer;
+    /* padding: 10px; */
+    /* background-color:lightsalmon; */
+    /* margin-top: 2px; */
+}
+
+.source ul li:hover{
+    background: #eee;
+}
+
+.basecomponent {
+    border: 1px dashed #eee; 
+    height: 60px; 
+    width: 62px;  
+    background-image: url(sign2.png);
+    background-size: cover;
+}

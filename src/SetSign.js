@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
 import Select from "react-select";
+import Dnd from "./dragNdrop/Dnd";
 import { Form, FormGroup, Label, Col, Row, Button } from 'reactstrap';
 
 export default class SetSign extends Component {
@@ -102,7 +103,7 @@ export default class SetSign extends Component {
   }
 
   setImages = () => {
-    return this.state.imagePreviewUrl.map((img, index) => <div className='d-flex mt-3 bg-secondary'> <img width='100%' height='100%' key={index + 1} src={'http://localhost:8000/upload/' + img} alt={index + 1} /></div>)
+    return this.state.imagePreviewUrl.map((img, index) => <div key={index + 1} className='d-flex mt-3 bg-secondary'> <img width='100%' height='100%' src={'http://localhost:8000/upload/' + img} alt={index + 1} /></div>)
   }
 
   // getCords = () => {
@@ -174,24 +175,21 @@ export default class SetSign extends Component {
             </Col>
           </Row>
           <Row form>
-            <Col md={2}></Col>
-            <Col md={8}>
-              <div id="docPage">
-                {
-                  imagePreviewUrl.length &&
-                  <center>
-                    {this.setImages()}
-                  </center>
-                }
-              </div>
-            </Col>
-            <Col md={2}></Col>
+            {/* <div id="docPage">
+              {
+                imagePreviewUrl.length &&
+                <center>
+                  {this.setImages()}
+                </center>
+              }
+            </div> */}
+            {
+              imagePreviewUrl.length &&
+              <Dnd imagePreviewUrl={imagePreviewUrl} setImages={this.setImages()} />
+            }
           </Row>
         </Form>
       </>
     );
   }
 }
-
-
-
