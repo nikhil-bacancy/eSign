@@ -24,28 +24,28 @@ app.use('/upload', express.static('./upload'));
 app.set('view engine', 'ejs');
 
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods','POST,PUT,GET,DELETE');
-    res.header('Access-Control-Allow-Headers', 'XMLHttpRequest,Origin, X-Requested-With, Content-Type, Accept, x-authorization, x-access-token, authorization');
-    next();
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'POST,PUT,GET,DELETE');
+  res.header('Access-Control-Allow-Headers', 'XMLHttpRequest,Origin, X-Requested-With, Content-Type, Accept, x-authorization, x-access-token, authorization');
+  next();
 });
-  
+
 const initRoutes = (app) => {
-    // including all routes
-    glob('./routes/*.js', (err, routes) => {
-      if (err) {
-        console.log('Error occured including routes');
-        return;
-      }
-      routes.forEach((routePath) => {
-        require(routePath).routes(app); // eslint-disable-line
-      });
-      console.warn('No of routes file : ', routes.length);
+  // including all routes
+  glob('./routes/*.js', (err, routes) => {
+    if (err) {
+      console.log('Error occured including routes');
+      return;
+    }
+    routes.forEach((routePath) => {
+      require(routePath).routes(app); // eslint-disable-line
     });
+    console.warn('No of routes file : ', routes.length);
+  });
 };
-  
+
 initRoutes(app);
-  
+
 app.listen(process.env.PORT || 3001, () => {
-  console.log(chalk.blue('App listening on port',process.env.PORT));
+  console.log(chalk.blue('App listening on port', process.env.PORT));
 });

@@ -1,7 +1,6 @@
 .target{
-    width: 85%;
+    /* width: 85%; */
     min-height: 100vh;    
-    overflow: scroll;
 }
  .mytargetcomponent {
     background-color: green;

@@ -27,7 +27,7 @@ export default class App22 extends Component {
     for (let k in payload) {
       formdata.append(k, payload[k]);
     }
-    axios.post('http://localhost:8000/pdftohtml', formdata)
+    axios.post('http://192.168.1.49:8000/pdftohtml', formdata)
       .then(function (response) {
         console.log(response);
       })

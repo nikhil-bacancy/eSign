@@ -29,14 +29,14 @@ class Dnd extends Component {
       newComponentsList = components.map((component) => {
         if (component.id === copyDropedComponent.id) {
           component.xCoord = x
-          component.yCoord = y
+          component.yCoord = y + document.documentElement.scrollTop
         }
         return component
       })
     } else {
       copyDropedComponent.component.id = components.length;
       copyDropedComponent.component.xCoord = x;
-      copyDropedComponent.component.yCoord = y;
+      copyDropedComponent.component.yCoord = y + document.documentElement.scrollTop;
       newComponentsList = _.concat([], components, copyDropedComponent.component)
     }
     this.setState({

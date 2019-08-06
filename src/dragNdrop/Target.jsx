@@ -8,9 +8,9 @@ class Target extends Component {
         const { connectDropTarget, components, onDrop, imagePreviewUrl, setImages } = this.props;
         return (
             connectDropTarget(
-                <div className="target">
+                <div className="target flex-grow-1">
                     {
-                        imagePreviewUrl.length && <center>{setImages}</center>
+                        imagePreviewUrl.length && setImages
                     }
                     {
                         components.map((componentObj, index) => <DraggableBox key={index} onUpdate={onDrop} {...components[index]} />)
@@ -24,6 +24,7 @@ class Target extends Component {
 const spec = {
     drop(props, monitor, component) {
         const item = monitor.getItem()
+        // console.log("TCL: drop -> item", component._reactInternalFiber.child.child.child)
         const clientOffset = monitor.getClientOffset()
         props.onDrop(item, clientOffset.x, clientOffset.y)
     },

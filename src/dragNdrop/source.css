@@ -1,5 +1,5 @@
 .source{
-    width: 5%;
+    /* width: 5%; */
     border-right: 1px solid #eee;
     min-height: 100vh;
 }
@@ -27,4 +27,5 @@
     width: 62px;  
     background-image: url(sign2.png);
     background-size: cover;
+    background-color: black;
 }

@@ -13,48 +13,21 @@ function getStyles(left, top, isDragging) {
   }
 }
 
-// export default DraggableBox = (props) => {
-//   // const { id, title, xCoord, yCoord, component, onUpdate, imagePreviewUrl, setImages } = props
-//   // console.log("TCL: setImages", setImages)
-
-//   // const [{ isDragging }, drag,] = useDrag({
-//   //   item: { type: component, id, xCoord, yCoord, title, component },
-//   //   collect: monitor => ({
-//   //     // isDragging: monitor.isDragging(),
-//   //   }),
-//   //   end: (item, monitor) => {
-//   //     const clientOffset = monitor.getClientOffset()
-//   //     onUpdate(item, clientOffset.x, clientOffset.y)
-//   //   },
-//   // })
-
-//   // return (
-//   //   <div ref={drag} style={getStyles(xCoord, yCoord, isDragging)}>
-//   //     {
-//   //       imagePreviewUrl.length &&
-//   //       <center>
-//   //         {ReactHtmlParser(component)}
-//   //         {props.setImages}
-//   //       </center>
-//   //     }
-
-//   //   </div>
-//   // )
-// }
-
-
 export default function DraggableBox(props) {
   const { id, title, xCoord, yCoord, component, onUpdate } = props
 
   const [{ isDragging }, drag,] = useDrag({
     item: { type: component, id, xCoord, yCoord, title, component },
     collect: monitor => ({
-      // isDragging: monitor.isDragging(),
+      isDragging: monitor.isDragging(),
     }),
     end: (item, monitor) => {
       const clientOffset = monitor.getClientOffset()
+      console.log('monitor.getItem().id', monitor.getDropResult);
+
       onUpdate(item, clientOffset.x, clientOffset.y)
     },
+
   })
 
   return (
@@ -65,3 +38,9 @@ export default function DraggableBox(props) {
     </div>
   )
 }
+
+
+// drag: function (ev) {
+//   var dragDivId = ev.target.closest("div")[0].parentElement.id;
+//   console.log(dragDivId);
+// },

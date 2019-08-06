@@ -4,6 +4,7 @@ import Select from "react-select";
 import Dnd from "./dragNdrop/Dnd";
 import { Form, FormGroup, Label, Col, Row, Button } from 'reactstrap';
 
+const baseUrl = process.env.REACT_APP_API_URL;
 export default class SetSign extends Component {
   constructor(props) {
     super(props);
@@ -15,13 +16,13 @@ export default class SetSign extends Component {
       pdfPreviewUrls: [],
       divPos: [],
       signPos: [],
-      docId: 1,
+      docId: 3,
       doc_signs_data: []
     };
   }
 
   componentDidMount = () => {
-    axios.get('http://localhost:8000/getRecipientList/')
+    axios.get(`${baseUrl}/getRecipientList/`)
       .then((response) => {
         let { selecteOptions, recipientList } = this.state;
         recipientList = response.data.data
@@ -39,7 +40,7 @@ export default class SetSign extends Component {
   }
 
   onLoadPdf = () => {
-    axios.get(`http://localhost:8000/getDoc/${this.state.docId}`)
+    axios.get(`${baseUrl}/getDoc/${this.state.docId}`)
       .then((response) => {
         if (response.data.data) {
           this.setState({ imagePreviewUrl: response.data.data })
@@ -51,7 +52,7 @@ export default class SetSign extends Component {
   }
 
   onsetDocSign = () => {
-    axios.post('http://localhost:8000/docsing/', this.state.doc_signs_data)
+    axios.post(`${baseUrl}/docsing/`, this.state.doc_signs_data)
       .then((response) => {
 
       })
@@ -93,7 +94,7 @@ export default class SetSign extends Component {
       pdf: this.state.file,
       sign: this.state.file2,
     }
-    axios.post('http://localhost:8000/pdftohtml/', this.formdataCoverter(payload))
+    axios.post('http://192.168.1.49:8000/pdftohtml/', this.formdataCoverter(payload))
       .then(function (response) {
         console.log(response);
       })
@@ -103,7 +104,7 @@ export default class SetSign extends Component {
   }
 
   setImages = () => {
-    return this.state.imagePreviewUrl.map((img, index) => <div key={index + 1} className='d-flex mt-3 bg-secondary'> <img width='100%' height='100%' src={'http://localhost:8000/upload/' + img} alt={index + 1} /></div>)
+    return this.state.imagePreviewUrl.map((img, index) => <div key={index + 1} id={'pg-' + (index + 1)} className='d-flex mt-3 bg-secondary'><img width='100%' src={'http://192.168.1.49:8000/upload/' + img} alt={index + 1} /></div>)
   }
 
   // getCords = () => {
@@ -131,7 +132,7 @@ export default class SetSign extends Component {
     const { seletedRecipients, selecteOptions, imagePreviewUrl } = this.state;
     return (
       <>
-        <Form className='m-5'>
+        <Form className='m-5' id='setsignForm'>
           <Row form>
             <Col md={6}>
               <FormGroup>
@@ -175,14 +176,6 @@ export default class SetSign extends Component {
             </Col>
           </Row>
           <Row form>
-            {/* <div id="docPage">
-              {
-                imagePreviewUrl.length &&
-                <center>
-                  {this.setImages()}
-                </center>
-              }
-            </div> */}
             {
               imagePreviewUrl.length &&
               <Dnd imagePreviewUrl={imagePreviewUrl} setImages={this.setImages()} />
