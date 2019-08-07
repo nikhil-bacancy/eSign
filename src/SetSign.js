@@ -3,12 +3,14 @@ import axios from "axios";
 import Select from "react-select";
 import Dnd from "./dragNdrop/Dnd";
 import { Form, FormGroup, Label, Col, Row, Button } from 'reactstrap';
+import './App.css';
 
 const baseUrl = process.env.REACT_APP_API_URL;
 export default class SetSign extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      pageId: null,
       seletedRecipients: null,
       recipientList: [],
       selecteOptions: [],
@@ -103,30 +105,13 @@ export default class SetSign extends Component {
       });
   }
 
-  setImages = () => {
-    return this.state.imagePreviewUrl.map((img, index) => <div key={index + 1} id={'pg-' + (index + 1)} className='d-flex mt-3 bg-secondary'><img width='100%' src={'http://192.168.1.49:8000/upload/' + img} alt={index + 1} /></div>)
+  onDragOverCaptureImage = (event) => {
+    this.setState({ pageId: event.target.id })
   }
 
-  // getCords = () => {
-  //   this.setState({
-  //     divPos: this.getPositionXY(),
-  //     signPos: this.getPositionXYSign()
-  //   })
-  // }
-
-  // getPositionXY = (event) => {
-  //   var element = document.getElementById('docPage');
-  //   var rect = element.getBoundingClientRect();
-  //   document.getElementById('divpos').innerText = rect.x + ',' + rect.y
-  //   return [rect.x, rect.y];
-  // }
-
-  // getPositionXYSign = (onStopEventXYvalue) => {
-  //   var element = document.getElementById('sign');
-  //   var rect = element.getBoundingClientRect();
-  //   document.getElementById('signpos').innerText = rect.x + ',' + rect.y
-  //   return [rect.x, rect.y]
-  // }
+  setImages = () => {
+    return this.state.imagePreviewUrl.map((img, index) => <div key={index + 1} className='d-flex mt-3 bg-secondary '><img className={"pdfpage"} width='100%' id={'pg-' + (index + 1)} onDragEnter={this.onDragOverCaptureImage} src={'http://192.168.1.49:8000/upload/' + img} alt={index + 1} /></div>);
+  }
 
   render() {
     const { seletedRecipients, selecteOptions, imagePreviewUrl } = this.state;
@@ -178,7 +163,7 @@ export default class SetSign extends Component {
           <Row form>
             {
               imagePreviewUrl.length &&
-              <Dnd imagePreviewUrl={imagePreviewUrl} setImages={this.setImages()} />
+              <Dnd imagePreviewUrl={imagePreviewUrl} pageId={this.state.pageId} setImages={this.setImages()} />
             }
           </Row>
         </Form>

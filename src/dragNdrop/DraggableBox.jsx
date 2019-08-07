@@ -23,11 +23,8 @@ export default function DraggableBox(props) {
     }),
     end: (item, monitor) => {
       const clientOffset = monitor.getClientOffset()
-      console.log('monitor.getItem().id', monitor.getDropResult);
-
       onUpdate(item, clientOffset.x, clientOffset.y)
     },
-
   })
 
   return (
@@ -38,9 +35,3 @@ export default function DraggableBox(props) {
     </div>
   )
 }
-
-
-// drag: function (ev) {
-//   var dragDivId = ev.target.closest("div")[0].parentElement.id;
-//   console.log(dragDivId);
-// },

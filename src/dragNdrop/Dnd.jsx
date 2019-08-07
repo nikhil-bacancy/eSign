@@ -28,13 +28,15 @@ class Dnd extends Component {
     if (copyDropedComponent.id !== undefined) {
       newComponentsList = components.map((component) => {
         if (component.id === copyDropedComponent.id) {
+          component.pageId = this.props.pageId;
           component.xCoord = x
           component.yCoord = y + document.documentElement.scrollTop
         }
         return component
       })
     } else {
-      copyDropedComponent.component.id = components.length;
+      copyDropedComponent.component.id = 'sign-' + components.length;
+      copyDropedComponent.component.pageId = this.props.pageId;
       copyDropedComponent.component.xCoord = x;
       copyDropedComponent.component.yCoord = y + document.documentElement.scrollTop;
       newComponentsList = _.concat([], components, copyDropedComponent.component)
