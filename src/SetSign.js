@@ -11,15 +11,18 @@ export default class SetSign extends Component {
     super(props);
     this.state = {
       pageId: null,
-      seletedRecipients: null,
+      seletedRecipient: null,
+      seletedRecipientsList: [],
       recipientList: [],
       selecteOptions: [],
       imagePreviewUrl: '',
-      pdfPreviewUrls: [],
       divPos: [],
+      isDataStored: false,
       signPos: [],
       docId: 3,
-      doc_signs_data: []
+      clientImageHeight: null,
+      clientImageWidth: null,
+      doc_signs_data: [],
     };
   }
 
@@ -53,16 +56,6 @@ export default class SetSign extends Component {
       });
   }
 
-  onsetDocSign = () => {
-    axios.post(`${baseUrl}/docsing/`, this.state.doc_signs_data)
-      .then((response) => {
-
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-
   formdataCoverter(payload) {
     let formdata = new FormData();
     for (let k in payload)
@@ -70,51 +63,52 @@ export default class SetSign extends Component {
     return formdata;
   }
 
-  handleChange = selectedOption => {
-    let { seletedRecipients, doc_signs_data } = this.state;
-    seletedRecipients = selectedOption;
-    if (seletedRecipients) {
-      doc_signs_data = selectedOption.map(({ value }) => {
-        let documentId = 1, organizationId = 1, creatorId = 1, recipientId = value;
+  handleChange = (selectedOption) => {
+    let { seletedRecipient, doc_signs_data, seletedRecipientsList } = { ...this.state };
+    seletedRecipient = selectedOption;
+    let isFound = false;
+    if (seletedRecipient) {
+      if (doc_signs_data.length) {
+        doc_signs_data.forEach(obj => { if (obj.recipientId === selectedOption.value) isFound = true })
+        if (!isFound) {
+          let statusId = 1, statusDate = Date.now();
+          let documentId = this.state.docId, organizationId = 1, creatorId = 1, recipientId = selectedOption.value;
+          doc_signs_data.push({ statusDate, statusId, organizationId, creatorId, recipientId, documentId })
+          seletedRecipientsList.push(selectedOption)
+        }
+      } else {
         let statusId = 1, statusDate = Date.now();
-        return { documentId, organizationId, creatorId, recipientId, statusId, statusDate };
-      });
-    } else {
-      doc_signs_data = []
+        let documentId = this.state.docId, organizationId = 1, creatorId = 1, recipientId = selectedOption.value;
+        doc_signs_data.push({ statusDate, statusId, organizationId, creatorId, recipientId, documentId })
+        seletedRecipientsList.push(selectedOption)
+      }
     }
-    this.setState({ seletedRecipients, doc_signs_data });
+    this.setState({ seletedRecipient, doc_signs_data, seletedRecipientsList });
   };
 
-  onSendFile = () => {
-    const payload = {
-      pageNo: this.state.pageNumber - 1,
-      totalPages: this.state.numPages,
-      signX: this.state.signPos[0],
-      signY: this.state.signPos[1],
-      divX: this.state.divPos[0],
-      divY: this.state.divPos[1],
-      pdf: this.state.file,
-      sign: this.state.file2,
-    }
-    axios.post('http://192.168.1.49:8000/pdftohtml/', this.formdataCoverter(payload))
-      .then(function (response) {
-        console.log(response);
+  onsetDocSign = () => {
+    axios.post(`${baseUrl}/docsing/`, this.state.doc_signs_data)
+      .then((response) => {
+        this.setState({ isDataStored: true })
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.log(error);
       });
   }
 
   onDragOverCaptureImage = (event) => {
+    console.log("TCL: onDragOverCaptureImage -> event.target.height", event.target.height)
+    console.log("TCL: onDragOverCaptureImage -> event.target.width", event.target.width)
+    console.log("TCL: onDragOverCaptureImage -> event.target.naturalHeight", event.target.naturalHeight)
     this.setState({ pageId: event.target.id })
   }
 
   setImages = () => {
-    return this.state.imagePreviewUrl.map((img, index) => <div key={index + 1} className='d-flex mt-3 bg-secondary '><img className={"pdfpage"} width='100%' id={'pg-' + (index + 1)} onDragEnter={this.onDragOverCaptureImage} src={'http://192.168.1.49:8000/upload/' + img} alt={index + 1} /></div>);
+    return this.state.imagePreviewUrl.map((img, index) => <div key={index + 1} className='d-flex mt-3 bg-secondary'><img width={"100%"} className={"pdfpage"} id={'pg-' + (index + 1)} onDragEnter={this.onDragOverCaptureImage} src={'http://192.168.1.49:8000/upload/' + img} alt={index + 1} /></div>);
   }
 
   render() {
-    const { seletedRecipients, selecteOptions, imagePreviewUrl } = this.state;
+    const { seletedRecipient, selecteOptions, imagePreviewUrl, isDataStored } = this.state;
     return (
       <>
         <Form className='m-5' id='setsignForm'>
@@ -123,38 +117,38 @@ export default class SetSign extends Component {
               <FormGroup>
                 <Label>Select Recipient: </Label>
                 <Select
-                  isMulti
                   isSearchable
-                  value={seletedRecipients}
+                  value={seletedRecipient}
                   onChange={this.handleChange}
                   options={selecteOptions}
                 />
               </FormGroup>
             </Col>
             <Col md={6}>
-              <Label>Set Doc Sign : </Label>
+              <Label>Selected Recipients : </Label>
               <FormGroup>
-                <Button onClick={this.onsetDocSign} > Add Details </Button>
+                {this.state.seletedRecipientsList.map((obj) => <Label id="divpos" key={obj.value} className={"pr-2 text-uppercase text-info"} size="md">{obj.label}</Label>)}
               </FormGroup>
+            </Col>
+            <Col md={3}>
+              {!isDataStored &&
+                <>
+                  <FormGroup>
+                    <Button onClick={this.onsetDocSign} color="primary"> Add Doc Sign Details </Button>
+                  </FormGroup>
+                </>
+              }
             </Col>
           </Row>
           <Row form>
-            <Col md={3}>
+            {/* <Col md={6}>
+              <Label>Selected Recipients : </Label>
               <FormGroup>
-                <Label size="lg"> Div Position :
-                  <Label id="divpos" sm={2} size="lg">258,456</Label>
-                </Label>
+                {this.state.seletedRecipientsList.map((obj) => <Label id="divpos" key={obj.value} className={"pr-2 text-uppercase text-info"} size="md">{obj.label}</Label>)}
               </FormGroup>
-            </Col>
-            <Col md={3}>
-              <FormGroup>
-                <Label size="lg"> Sign Position :
-                  <Label id="signpos" sm={2} size="lg">258,456</Label>
-                </Label>
-              </FormGroup>
-            </Col>
+            </Col> */}
           </Row>
-          <Button onClick={this.onSendFile} >Send File</Button>
+          {/* <Button onClick={this.onSendFile} >Send File</Button> */}
           <Row form>
             <Col md={12}>
               <center><Label size="lg" className='align'> File Viewer</Label></center>
@@ -163,7 +157,7 @@ export default class SetSign extends Component {
           <Row form>
             {
               imagePreviewUrl.length &&
-              <Dnd imagePreviewUrl={imagePreviewUrl} pageId={this.state.pageId} setImages={this.setImages()} />
+              <Dnd pageId={this.state.pageId} seletedRecipient={this.state.seletedRecipient} setImages={this.setImages()} />
             }
           </Row>
         </Form>
@@ -171,3 +165,24 @@ export default class SetSign extends Component {
     );
   }
 }
+
+// onSendFile = () => {
+//   const payload = {
+//     pageNo: this.state.pageNumber - 1,
+//     totalPages: this.state.numPages,
+//     signX: this.state.signPos[0],
+//     signY: this.state.signPos[1],
+//     divX: this.state.divPos[0],
+//     divY: this.state.divPos[1],
+//     pdf: this.state.file,
+//     sign: this.state.file2,
+//   }
+//   axios.post('http://192.168.1.49:8000/pdftohtml/', this.formdataCoverter(payload))
+//     .then(function (response) {
+//       console.log(response);
+//     })
+//     .catch(function (error) {
+//       console.log(error);
+//     });
+// }
+

@@ -5,12 +5,12 @@ import DraggableBox from "./DraggableBox";
 
 class Target extends Component {
     render() {
-        const { connectDropTarget, components, onDrop, imagePreviewUrl, setImages } = this.props;
+        const { connectDropTarget, components, onDrop, setImages } = this.props;
         return (
             connectDropTarget(
                 <div className="target flex-grow-1">
                     {
-                        imagePreviewUrl.length && setImages
+                        setImages.length && setImages
                     }
                     {
                         components.map((componentObj, index) => <DraggableBox key={index} onUpdate={onDrop} {...components[index]} />)

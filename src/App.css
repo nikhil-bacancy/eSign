@@ -10,3 +10,7 @@
   -o-user-drag: none;
   /* user-drag: none; */
 }
+
+.pdf {
+  width: fit-content;
+}

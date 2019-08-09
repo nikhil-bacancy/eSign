@@ -1,5 +1,6 @@
 const DocModifier = require('../utils/test');
 const db = require('../models/index');
+var _ = require('lodash');
 
 const doc_signs = db.doc_signs;
 const documents = db.documents;
@@ -15,11 +16,45 @@ let pageConfig = {
   PDF_DOC: ''
 };
 
+const docsCreateBulk = (req) => {
+  return new Promise((resolve, reject) => {
+    const doc_sign = [];
+    let counter = 0;
+    _.each(req.body, (payload) => {
+      doc_signs.findOne({
+        where: { documentId: payload.documentId, creatorId: payload.creatorId, recipientId: payload.recipientId },
+      }).then(res => {
+        if (res) {
+          doc_sign.push(res.dataValues);
+        } else {
+          doc_signs.create({
+            documentId: payload.documentId,
+            organizationId: payload.organizationId,
+            creatorId: payload.creatorId,
+            recipientId: payload.recipientId,
+            statusId: payload.statusId,
+            statusDate: payload.statusDate,
+          }).then(res => {
+            doc_sign.push(res);
+          })
+        }
+        counter++;
+        if (counter === req.body.length) {
+          resolve(doc_sign);
+        }
+      })
+    })
+  })
+}
 
-exports.addDocSignDetais = async function (req, res) {
-  let doc_sign;
+exports.addDocSignDetais = async (req, res) => {
   try {
-    doc_sign = await doc_signs.bulkCreate(req.body, { returning: true });
+    const data = await docsCreateBulk(req);
+    return res.status(200).json({
+      status: true,
+      message: 'Document sign information stored successfully.',
+      data,
+    });
   } catch (error) {
     return res.status(500).json({
       status: false,
@@ -27,13 +62,7 @@ exports.addDocSignDetais = async function (req, res) {
       details: error,
     });
   }
-  return res.status(200).json({
-    status: true,
-    message: 'Document sign information stored successfully.',
-    data: doc_sign,
-  });
 }
-
 
 exports.getPdfImageUrls = async (req, res) => {
   let docData;

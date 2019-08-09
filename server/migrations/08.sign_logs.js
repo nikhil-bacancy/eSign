@@ -18,7 +18,7 @@ module.exports = {
             },
             signID: {
                 type: Sequelize.INTEGER,
-                allowNull: false,
+                allowNull: true,
                 references: {
                     model: 'signs',
                     key: 'id'
