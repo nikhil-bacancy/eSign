@@ -58,6 +58,13 @@ db.recipients.hasMany(db.doc_signs);
 db.doc_signs.belongsTo(db.status);
 db.status.hasMany(db.doc_signs);
 
+db.sign_logs.belongsTo(db.doc_signs)
+db.doc_signs.hasMany(db.sign_logs);
+db.sign_logs.belongsTo(db.signs)
+db.signs.hasMany(db.sign_logs);
+db.sign_logs.belongsTo(db.status);
+db.status.hasMany(db.sign_logs);
+
 // db.feedbacks.belongsTo(db.candidates);
 // db.candidates.belongsTo(db.colleges);
 

@@ -1,4 +1,4 @@
-const pageConfig = require("../controllers/pdftohtml.controller").pageConfig;
+// const pageConfig = require("../controllers/fileupload.controller").pageConfig;
 const fs = require('fs');
 const { PDFDocumentFactory, PDFDocumentWriter, drawImage } = require('pdf-lib');
 
@@ -19,10 +19,12 @@ const [marioPngRef, marioPngDims] = pdfDoc.embedPNG(assets.marioPngBytes);
 const PNG = 'MarioPng';
 const PNG_WIDTH = marioPngDims.width * 0.15;
 const PNG_HEIGHT = marioPngDims.height * 0.10;
-const pageNum =  pageConfig.PAGE_NUM;
-const totalPage =  pageConfig.TOTAL_PAGES;
-const posX =  pageConfig.SIGN_POSX;
-const posY =  pageConfig.SIGN_POSY;
+const pageNum = 1 || pageConfig.PAGE_NUM;
+const totalPage = 2 || pageConfig.TOTAL_PAGES;
+const posX = 50 || pageConfig.SIGN_POSX;
+console.log("TCL: posX", posX)
+const posY = 200 || pageConfig.SIGN_POSY;
+console.log("TCL: posY", posY)
 
 /* ====================== 3. Modify Existing Page =========================== */
 
@@ -36,9 +38,9 @@ const existingPage = pages[pageNum].addImageObject(PNG, marioPngRef);
 // Here we (1) register the content stream to the PDF document, and (2) add the
 // reference to the registered stream to the page's content streams.
 const newContentStream = pdfDoc.createContentStream(
-    drawImage(PNG, {
+  drawImage(PNG, {
     x: posX,
-    y: posY * totalPage,
+    y: posY,
     width: PNG_WIDTH,
     height: PNG_HEIGHT,
   }),
@@ -58,8 +60,8 @@ const pdfBytes = PDFDocumentWriter.saveToBytes(pdfDoc);
 
 var resultDir = `${__dirname}/results`;
 
-if (!fs.existsSync(resultDir)){
-    fs.mkdirSync(resultDir);
+if (!fs.existsSync(resultDir)) {
+  fs.mkdirSync(resultDir);
 }
 const filePath = `${__dirname}/results/modified.pdf`;
 fs.writeFileSync(filePath, pdfBytes);

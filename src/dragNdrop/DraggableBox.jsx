@@ -14,10 +14,10 @@ function getStyles(left, top, isDragging) {
 }
 
 export default function DraggableBox(props) {
-  const { id, title, xCoord, yCoord, component, onUpdate } = props
+  const { id, title, left, top, component, onUpdate } = props
 
   const [{ isDragging }, drag,] = useDrag({
-    item: { type: component, id, xCoord, yCoord, title, component },
+    item: { type: component, id, left, top, title, component },
     collect: monitor => ({
       isDragging: monitor.isDragging(),
     }),
@@ -28,7 +28,7 @@ export default function DraggableBox(props) {
   })
 
   return (
-    <div ref={drag} style={getStyles(xCoord, yCoord, isDragging)}>
+    <div ref={drag} style={getStyles(left, top, isDragging)}>
       {
         ReactHtmlParser(component)
       }

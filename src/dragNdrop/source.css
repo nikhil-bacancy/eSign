@@ -1,6 +1,6 @@
 .source{
     /* width: 5%; */
-    border-right: 1px solid #eee;
+    /* border-right: 1px solid #eee; */
     min-height: 100vh;
 }
 .source ul{
@@ -22,7 +22,7 @@
 }
 
 .basecomponent {
-    border: 1px dashed #eee; 
+    /* border: 1px dashed #eee;  */
     height: 60px; 
     width: 62px;  
     background-image: url(sign2.png);

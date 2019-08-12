@@ -8,7 +8,7 @@ module.exports = {
                 primaryKey: true,
                 type: Sequelize.INTEGER
             },
-            docSignID: {
+            docSignId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 references: {
@@ -16,7 +16,7 @@ module.exports = {
                     key: 'id'
                 }
             },
-            signID: {
+            signId: {
                 type: Sequelize.INTEGER,
                 allowNull: true,
                 references: {
@@ -28,7 +28,7 @@ module.exports = {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
-            statusID: {
+            statusId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
                 references: {
