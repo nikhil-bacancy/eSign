@@ -3,6 +3,7 @@ const db = require('../models/index');
 var _ = require('lodash');
 
 const doc_signs = db.doc_signs;
+const recipients = db.recipients;
 const documents = db.documents;
 
 let pageConfig = {
@@ -21,48 +22,85 @@ const docsCreateBulk = (req) => {
     const doc_sign = [];
     let counter = 0;
     _.each(req.body, (payload) => {
-      doc_signs.findOne({
+      doc_signs.findOrCreate({
         where: { documentId: payload.documentId, creatorId: payload.creatorId, recipientId: payload.recipientId },
-      }).then(res => {
-        if (res) {
-          doc_sign.push(res.dataValues);
-        } else {
-          doc_signs.create({
-            documentId: payload.documentId,
-            organizationId: payload.organizationId,
-            creatorId: payload.creatorId,
-            recipientId: payload.recipientId,
-            statusId: payload.statusId,
-            statusDate: payload.statusDate,
-          }).then(res => {
-            doc_sign.push(res);
-          })
+        include: [
+          {
+            model: recipients,
+            attributes: ['id', 'name'],
+            required: true,
+          }],
+        defaults: {
+          documentId: payload.documentId,
+          creatorId: payload.creatorId,
+          recipientId: payload.recipientId,
+          statusId: payload.statusId,
+          statusDate: payload.statusDate,
         }
+      }).then(([data, created]) => {
+        doc_sign.push(data);
         counter++;
         if (counter === req.body.length) {
-          resolve(doc_sign);
+          resolve({
+            status: created,
+            message: created ? 'Document sign data stored successfully.' : 'Document sign data already exist.',
+            data: doc_sign,
+          });
         }
-      })
+      }).catch(error => {
+        reject({
+          status: false,
+          message: 'Internal server error',
+          details: error,
+        });
+      });
     })
   })
 }
 
-exports.addDocSignDetais = async (req, res) => {
-  try {
-    const data = await docsCreateBulk(req);
+exports.create = async (req, res) => {
+  await docsCreateBulk(req).then((data) => {
     return res.status(200).json({
-      status: true,
-      message: 'Document sign information stored successfully.',
-      data,
+      status: data.status,
+      message: data.message,
+      data: data.data,
     });
-  } catch (error) {
+  }).catch((error) => {
     return res.status(500).json({
-      status: false,
-      message: 'Internal server error',
-      details: error,
+      status: error.status,
+      message: error.message,
+      details: error.details,
     });
-  }
+  });
 }
+
+// exports.update = async (req, res) => {
+//   const docSignId = req.params.id;
+//   await doc_signs.update(
+//     { pageRatio: req.body.pageRatio },
+//     { where: { id: docSignId }, returning: true, pain: true }
+//   ).then(([rowAffected, data]) => {
+//     if (rowAffected) {
+//       return res.status(200).json({
+//         status: true,
+//         message: 'doc sign details updated successfully.',
+//         data: data,
+//       });
+//     } else {
+//       return res.status(500).json({
+//         status: false,
+//         message: 'update Unsuccessful / check Id.',
+//         data: data,
+//       });
+//     }
+//   }).catch((err) => {
+//     return res.status(500).json({
+//       status: false,
+//       message: 'details not found.',
+//       details: err.toString(),
+//     });
+//   });
+// }
 
 exports.getPdfImageUrls = async (req, res) => {
   let docData;

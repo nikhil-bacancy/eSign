@@ -8,6 +8,7 @@ import _ from 'lodash';
 import './Dnd.css';
 import './source.css';
 import { Button } from 'reactstrap';
+import { toastError, toastSuccess, toastDefault } from '../NotificationToast';
 
 const baseUrl = process.env.REACT_APP_API_URL;
 class Dnd extends Component {
@@ -29,53 +30,66 @@ class Dnd extends Component {
     const { seletedRecipient, pageDetails } = this.props;
     const copyDropedComponent = JSON.parse(JSON.stringify(dropedComponent));
     let newComponentsList;
-    if (copyDropedComponent.id !== undefined) {
-      newComponentsList = components.map((component) => {
-        if (component.id === copyDropedComponent.id) {
-          component.pageId = parseInt(this.props.pageDetails.pageId.slice(3));
-          component.left = x
-          component.top = y + document.documentElement.scrollTop
-          component.signXCoord = x - pageDetails.pageLeft;
-          component.signYCoord = (y + document.documentElement.scrollTop) - pageDetails.pageTop;
-          component.recipientId = seletedRecipient.value;
-          component.docSignId = seletedRecipient.docSignId;
-        }
-        return component
+    if (seletedRecipient) {
+      if (copyDropedComponent.id !== undefined) {
+        newComponentsList = components.map((component) => {
+          if (component.id === copyDropedComponent.id) {
+            component.pageId = parseInt(this.props.pageDetails.pageId.slice(3));
+            component.left = x
+            component.top = y + document.documentElement.scrollTop
+            component.signXCoord = x - pageDetails.pageLeft;
+            component.signYCoord = (y + document.documentElement.scrollTop) - pageDetails.pageTop;
+            component.recipientId = seletedRecipient.value;
+            component.docSignId = seletedRecipient.docSignId;
+          }
+          return component
+        })
+      } else {
+        copyDropedComponent.component.id = components.length;
+        copyDropedComponent.component.pageId = parseInt(this.props.pageDetails.pageId.slice(3));
+        copyDropedComponent.component.left = x;
+        copyDropedComponent.component.top = y + document.documentElement.scrollTop;
+        copyDropedComponent.component.signXCoord = x - pageDetails.pageLeft;
+        copyDropedComponent.component.signYCoord = (y + document.documentElement.scrollTop) - pageDetails.pageTop;
+        copyDropedComponent.component.recipientId = seletedRecipient.value;
+        copyDropedComponent.component.docSignId = seletedRecipient.docSignId;
+        newComponentsList = _.concat([], components, copyDropedComponent.component)
+      }
+      this.setState({
+        components: newComponentsList,
       })
     } else {
-      copyDropedComponent.component.id = components.length;
-      copyDropedComponent.component.pageId = parseInt(this.props.pageDetails.pageId.slice(3));
-      copyDropedComponent.component.left = x;
-      copyDropedComponent.component.top = y + document.documentElement.scrollTop;
-      copyDropedComponent.component.signXCoord = x - pageDetails.pageLeft;
-      copyDropedComponent.component.signYCoord = (y + document.documentElement.scrollTop) - pageDetails.pageTop;
-      copyDropedComponent.component.recipientId = seletedRecipient.value;
-      copyDropedComponent.component.docSignId = seletedRecipient.docSignId;
-      newComponentsList = _.concat([], components, copyDropedComponent.component)
+      toastDefault("Please Select Recipient.!")
     }
-    this.setState({
-      components: newComponentsList,
-    })
   }
 
   onSendFile = () => {
     const { components } = { ...this.state };
-    let payload = components.map((obj) => {
-      let docSignId = obj.docSignId;
-      let pageNo = obj.pageId;
-      let signCoord = obj.signXCoord + ',' + obj.signYCoord;
-      let statusId = 1;
-      let statusDate = Date.now();
-      return { docSignId, pageNo, signCoord, statusId, statusDate };
-    });
-
-    axios.post(`${baseUrl}/signlogs`, payload)
-      .then((response) => {
-        console.log("TCL: Dnd -> onSendFile -> response", response)
-      })
-      .catch((error) => {
-        console.log(error);
+    const { pageWidth, pageHeight } = this.props.pageDetails;
+    if (components.length) {
+      let payload = components.map((obj) => {
+        let docSignId = obj.docSignId;
+        let pageNo = obj.pageId;
+        let signCoord = obj.signXCoord + ',' + obj.signYCoord;
+        let pageRatio = (obj.signXCoord / pageWidth) + ',' + (obj.signYCoord / pageHeight);
+        let statusId = 1;
+        let statusDate = Date.now();
+        return { docSignId, pageNo, signCoord, pageRatio, statusId, statusDate };
       });
+      axios.post(`${baseUrl}/signlogs`, payload)
+        .then((response) => {
+          toastSuccess(response.data.message)
+        })
+        .catch((error) => {
+          toastError(error.message)
+        });
+    } else {
+      if (this.props.seletedRecipient) {
+        toastDefault("No Signature Found.!")
+      } else {
+        toastDefault("Please Select Recipient.!")
+      }
+    }
   }
 
   render() {

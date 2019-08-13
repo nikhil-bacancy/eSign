@@ -5,8 +5,8 @@ module.exports = (sequelize, DataTypes) => {
     phoneNumber: DataTypes.STRING(10),
     email: DataTypes.STRING,
   }, {});
-   
-  recipients.associate = function(models) {
+
+  recipients.associate = function (models) {
     // associations can be defined here
   };
   return recipients;

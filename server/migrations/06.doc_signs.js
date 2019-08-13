@@ -16,14 +16,6 @@ module.exports = {
                     key: 'id'
                 }
             },
-            organizationId: {
-                type: Sequelize.INTEGER,
-                allowNull: false,
-                references: {
-                    model: 'organizations',
-                    key: 'id',
-                }
-            },
             creatorId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,

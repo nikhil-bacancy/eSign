@@ -20,45 +20,34 @@ const signLogCreateBulk = (req) => {
     const sign_logs_details = [];
     let counter = 0;
     _.each(req.body, (payload) => {
-      sign_logs.findOne({
-        include: [
-          {
-            model: doc_signs,
-            required: true,
-          }],
-        where: { docSignId: payload.docSignId, signId: payload.signId, pageNo: payload.pageNo, signCoord: payload.signCoord },
-      }).then(res => {
-        if (res) {
-          console.log(" iiiiffffffff TCL: signLogCreateBulk ++++++++++++++ res", res.dataValues)
-          counter++;
-          if (counter === req.body.length) {
-            resolve(sign_logs_details);
-          }
-          sign_logs_details.push(res.dataValues);
-        } else {
-          console.log("eeeeelllllsssssseeeeeeeee TCL: signLogCreateBulk ---------------- res", res)
-          sign_logs.create({
-            docSignId: payload.docSignId,
-            signId: payload.signId,
-            pageNo: payload.pageNo,
-            signCoord: payload.signCoord,
-            statusId: payload.statusId,
-            statusDate: payload.statusDate,
-          }).then(res => {
-            sign_logs_details.push(res);
-            counter++;
-            if (counter === req.body.length) {
-              resolve(sign_logs_details);
-            }
-          }).catch(error => {
-            reject(error);
+      sign_logs.findOrCreate({
+        where: { docSignId: payload.docSignId, pageNo: payload.pageNo, signCoord: payload.signCoord },
+        defaults: {
+          docSignId: payload.docSignId,
+          signId: payload.signId,
+          pageNo: payload.pageNo,
+          signCoord: payload.signCoord,
+          pageRatio: payload.pageRatio,
+          statusId: payload.statusId,
+          statusDate: payload.statusDate,
+        }
+      }).then(([data, created]) => {
+        sign_logs_details.push(data);
+        counter++;
+        if (counter === req.body.length) {
+          resolve({
+            status: created,
+            message: created ? 'Document sign logs stored successfully.' : 'Document sign logs already exist.',
+            data: sign_logs_details,
           });
         }
-        // counter++;
-        // if (counter === req.body.length) {
-        //   resolve(sign_logs_details);
-        // }
-      })
+      }).catch(error => {
+        reject({
+          status: false,
+          message: 'Internal server error',
+          details: error,
+        });
+      });
     })
   })
 }
@@ -67,15 +56,15 @@ const signLogCreateBulk = (req) => {
 exports.addSignLogDetais = async (req, res) => {
   await signLogCreateBulk(req).then((data) => {
     return res.status(200).json({
-      status: true,
-      message: 'Document sign log information stored successfully.',
-      data,
+      status: data.status,
+      message: data.message,
+      data: data.data,
     });
   }).catch((error) => {
     return res.status(500).json({
-      status: false,
-      message: 'Internal server error',
-      details: error.original.detail,
+      status: error.status,
+      message: error.message,
+      details: error.details,
     });
   });
 }

@@ -1,24 +1,57 @@
 const db = require('../models/index');
-
+var _ = require('lodash');
 const recipients = db.recipients;
 
-exports.create =  async function (req,res) {
-  let recipientsData;
-  try {
-    recipientsData = await recipients.bulkCreate(req.body,{ returning: true });
-  } catch (error) {
-    return res.status(500).json({
-      status: false,
-      message: 'Internal server error',
-      details: error,
+const addRecipient = (req) => {
+  return new Promise((resolve, reject) => {
+    const recipient_details = [];
+    let counter = 0;
+    _.each(req.body, (payload) => {
+      recipients.findOrCreate({
+        where: { email: payload.email },
+        defaults: {
+          name: payload.name,
+          phoneNumber: payload.phoneNumber,
+          email: payload.email,
+        }
+      }).then(([user, created]) => {
+        recipient_details.push(user);
+        counter++;
+        if (counter === req.body.length) {
+          resolve({
+            status: created,
+            message: created ? 'Sender information stored successfully.' : 'Sender data already exist.',
+            data: recipient_details,
+          });
+        }
+      }).catch(error => {
+        reject({
+          status: false,
+          message: 'Internal server error',
+          details: error,
+        });
+      });
+    })
+  })
+}
+
+
+exports.create = async (req, res) => {
+  await addRecipient(req).then((data) => {
+    return res.status(200).json({
+      status: data.status,
+      message: data.message,
+      data: data.data,
     });
-  }
-  return res.status(200).json({
-    status: true,
-    message: 'recipient information stored successfully.',
-    data: recipientsData,
+  }).catch((error) => {
+    return res.status(500).json({
+      status: error.status,
+      message: error.message,
+      details: error.details,
+    });
   });
 }
+
 
 exports.getRecipientList = async function (req, res) {
   let recipientsData;

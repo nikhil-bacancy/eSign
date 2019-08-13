@@ -1,23 +1,28 @@
+
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('organizations', {
+    return queryInterface.createTable('signs', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
-        allowNull: false,
-        type: Sequelize.STRING(50)
-      },
-      phoneNumber: {
-        allowNull: false,
-        type: Sequelize.STRING(10)
-      },
       email: {
         allowNull: false,
         type: Sequelize.STRING
+      },
+      name: {
+        allowNull: false,
+        type: Sequelize.TEXT
+      },
+      path: {
+        allowNull: false,
+        type: Sequelize.TEXT
+      },
+      isDefault: {
+        allowNull: true,
+        type: Sequelize.BOOLEAN
       },
       createdAt: {
         allowNull: false,
@@ -30,6 +35,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('organizations');
+    return queryInterface.dropTable('signs');
   }
 };

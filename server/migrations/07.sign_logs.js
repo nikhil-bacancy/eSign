@@ -24,10 +24,6 @@ module.exports = {
                     key: 'id'
                 }
             },
-            pageNo: {
-                type: Sequelize.INTEGER,
-                allowNull: false,
-            },
             statusId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
@@ -36,7 +32,15 @@ module.exports = {
                     key: 'id'
                 }
             },
+            pageNo: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+            },
             signCoord: {
+                type: Sequelize.STRING,
+                allowNull: false,
+            },
+            pageRatio: {
                 type: Sequelize.STRING,
                 allowNull: false,
             },

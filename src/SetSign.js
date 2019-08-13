@@ -4,6 +4,7 @@ import Select from "react-select";
 import Dnd from "./dragNdrop/Dnd";
 import { Form, FormGroup, Label, Col, Row, Button } from 'reactstrap';
 import './App.css';
+import { toastSuccess, toastError } from "./NotificationToast";
 
 const baseUrl = process.env.REACT_APP_API_URL;
 export default class SetSign extends Component {
@@ -25,7 +26,8 @@ export default class SetSign extends Component {
       divPos: [],
       isDataStored: false,
       signPos: [],
-      docId: 3,
+      docId: 2,
+      creatorId: 2,
       clientImageHeight: null,
       clientImageWidth: null,
       doc_signs_data: [],
@@ -79,14 +81,14 @@ export default class SetSign extends Component {
         doc_signs_data.forEach(obj => { if (obj.recipientId === selectedOption.value) isFound = true })
         if (!isFound) {
           let statusId = 1, statusDate = Date.now();
-          let documentId = this.state.docId, organizationId = 1, creatorId = 1, recipientId = selectedOption.value;
-          doc_signs_data.push({ statusDate, statusId, organizationId, creatorId, recipientId, documentId })
+          let documentId = this.state.docId, creatorId = this.state.creatorId, recipientId = selectedOption.value;
+          doc_signs_data.push({ statusDate, statusId, creatorId, recipientId, documentId })
           seletedRecipientsList.push(selectedOption)
         }
       } else {
         let statusId = 1, statusDate = Date.now();
-        let documentId = this.state.docId, organizationId = 1, creatorId = 1, recipientId = selectedOption.value;
-        doc_signs_data.push({ statusDate, statusId, organizationId, creatorId, recipientId, documentId })
+        let documentId = this.state.docId, creatorId = this.state.creatorId, recipientId = selectedOption.value;
+        doc_signs_data.push({ statusDate, statusId, creatorId, recipientId, documentId })
         seletedRecipientsList.push(selectedOption)
       }
     }
@@ -96,19 +98,20 @@ export default class SetSign extends Component {
   onsetDocSign = () => {
     axios.post(`${baseUrl}/docsing/`, this.state.doc_signs_data)
       .then((response) => {
+        toastSuccess(response.data.message)
         let { doc_signs_data, selecteOptions, seletedRecipient } = { ...this.state };
         doc_signs_data = response.data.data
         seletedRecipient = null
-        selecteOptions = response.data.data.map((obj, index) => {
-          let value = selecteOptions[index].value;
-          let label = selecteOptions[index].label;
+        selecteOptions = response.data.data.map((obj) => {
+          let value = obj.recipient.id;
+          let label = obj.recipient.name;
           let docSignId = obj.id;
           return { value, label, docSignId };
         });
         this.setState({ seletedRecipient, selecteOptions, doc_signs_data, isDataStored: true })
       })
       .catch((error) => {
-        console.log(error);
+        toastError(error.message)
       });
   }
 

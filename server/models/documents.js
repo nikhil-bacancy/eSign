@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     statusId: DataTypes.INTEGER,
     statusDate: DataTypes.DATE,
   }, {});
-  documents.associate = function(models) {
+  documents.associate = function (models) {
     // associations can be defined here
   };
   return documents;

@@ -49,8 +49,6 @@ db.status.hasMany(db.documents);
 
 db.doc_signs.belongsTo(db.documents);
 db.documents.hasMany(db.doc_signs);
-db.doc_signs.belongsTo(db.organizations);
-db.organizations.hasMany(db.doc_signs);
 db.doc_signs.belongsTo(db.creators);
 db.creators.hasMany(db.doc_signs);
 db.doc_signs.belongsTo(db.recipients);
