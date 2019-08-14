@@ -1,9 +1,11 @@
 const DocModifier = require('../utils/test');
 const db = require('../models/index');
 var _ = require('lodash');
+const middleware = require('../helper/middleware');
 
 const doc_signs = db.doc_signs;
 const recipients = db.recipients;
+const creators = db.creators;
 const documents = db.documents;
 
 let pageConfig = {
@@ -183,4 +185,45 @@ exports.sendDoc = function (req, res) {
       details: err,
     });
   }
-}  
+}
+
+encriptionSample = () => {
+  const token = middleware.encrypt({ foo: 'bar' });
+  console.log("TCL: encriptionSample -> middleware.encrypt({ foo: 'bar' })", token);
+  const finalData = middleware.decrypt(token);
+  console.log("TCL: encriptionSample -> middleware.decrypt", finalData);
+}
+
+exports.getDocSignDetails = async (req, res) => {
+  encriptionSample();
+  await doc_signs.find({
+    where: { id: req.params.id },
+    attributes: ['id', 'documentId', 'creatorId', 'recipientId'],
+    include: [
+      {
+        model: documents,
+        attributes: ['name', 'path', 'docType', 'totalPages'],
+        required: true,
+      }, {
+        model: creators,
+        attributes: ['name'],
+        required: true,
+      }, {
+        model: recipients,
+        attributes: ['name'],
+        required: true,
+      }],
+  }).then(response => {
+    return res.status(200).json({
+      status: response ? true : false,
+      message: 'Doc Sign Data Fetched Successfully..!',
+      details: response,
+    });
+  }).catch(error => {
+    return res.status(500).json({
+      status: false,
+      message: 'Internal server error',
+      details: error,
+    });
+  });
+}

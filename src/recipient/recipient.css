@@ -1,0 +1,14 @@
+.signdocument{
+    /* width: 85%; */
+    min-height: 100vh;  
+    background: gray;  
+}
+.sign {
+    /* border: 1px dashed #eee;  */
+    height: 60px; 
+    width: 62px;  
+    background-image: url(signature.png);
+    background-size: cover;
+    position: absolute;
+    background-color: black;
+}

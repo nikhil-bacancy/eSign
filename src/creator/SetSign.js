@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import axios from "axios";
 import Select from "react-select";
-import Dnd from "./dragNdrop/Dnd";
+import Dnd from "../dragNdrop/Dnd";
 import { Form, FormGroup, Label, Col, Row, Button } from 'reactstrap';
-import './App.css';
-import { toastSuccess, toastError } from "./NotificationToast";
+import '../App.css';
+import { toastSuccess, toastError } from "../NotificationToast";
 
 const baseUrl = process.env.REACT_APP_API_URL;
 export default class SetSign extends Component {
