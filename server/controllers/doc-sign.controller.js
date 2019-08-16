@@ -2,7 +2,7 @@ const DocModifier = require('../utils/test');
 const db = require('../models/index');
 var _ = require('lodash');
 const middleware = require('../helper/middleware');
-
+const emailer = require('../helper/emailer');
 const doc_signs = db.doc_signs;
 const recipients = db.recipients;
 const creators = db.creators;
@@ -29,7 +29,7 @@ const docsCreateBulk = (req) => {
         include: [
           {
             model: recipients,
-            attributes: ['id', 'name'],
+            attributes: ['id', 'name', 'email'],
             required: true,
           }],
         defaults: {
@@ -187,42 +187,40 @@ exports.sendDoc = function (req, res) {
   }
 }
 
-encriptionSample = () => {
-  const token = middleware.encrypt({ foo: 'bar' });
-  console.log("TCL: encriptionSample -> middleware.encrypt({ foo: 'bar' })", token);
-  const finalData = middleware.decrypt(token);
-  console.log("TCL: encriptionSample -> middleware.decrypt", finalData);
-}
-
-exports.getDocSignDetails = async (req, res) => {
-  encriptionSample();
-  await doc_signs.find({
-    where: { id: req.params.id },
-    attributes: ['id', 'documentId', 'creatorId', 'recipientId'],
-    include: [
-      {
-        model: documents,
-        attributes: ['name', 'path', 'docType', 'totalPages'],
-        required: true,
-      }, {
-        model: creators,
-        attributes: ['name'],
-        required: true,
-      }, {
-        model: recipients,
-        attributes: ['name'],
-        required: true,
-      }],
-  }).then(response => {
-    return res.status(200).json({
-      status: response ? true : false,
-      message: 'Doc Sign Data Fetched Successfully..!',
-      details: response,
+exports.getDocSignDetails = (req, res) => {
+  middleware.decrypt(req.query.token).then(tokenData => {
+    const data = JSON.parse(JSON.stringify(tokenData));
+    doc_signs.find({
+      where: { id: data.docSignId },
+      attributes: ['id', 'documentId', 'creatorId', 'recipientId'],
+      include: [
+        {
+          model: documents,
+          attributes: ['name', 'path', 'docType', 'totalPages'],
+        }, {
+          model: creators,
+          attributes: ['name'],
+        }, {
+          model: recipients,
+          attributes: ['name'],
+        }],
+    }).then(response => {
+      return res.status(200).json({
+        status: response ? true : false,
+        message: 'Doc Sign Data Fetched Successfully..!',
+        details: response,
+      });
+    }).catch(error => {
+      return res.status(500).json({
+        status: false,
+        message: 'Internal server error',
+        details: error,
+      });
     });
   }).catch(error => {
     return res.status(500).json({
       status: false,
-      message: 'Internal server error',
+      message: 'Token Has Expired.!',
       details: error,
     });
   });

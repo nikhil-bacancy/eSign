@@ -24,7 +24,7 @@ export default class DoSign extends Component {
       divPos: [],
       isDataStored: false,
       signPos: [],
-      docId: 2,
+      docId: 4,
       creatorId: 2,
       clientImageHeight: null,
       clientImageWidth: null,

@@ -18,6 +18,7 @@ export default class SetSign extends Component {
         pageHeight: null,
         pageWidth: null
       },
+      sender: "nikhil.patel@bacancytechnology.com",
       seletedRecipient: null,
       seletedRecipientsList: [],
       recipientList: [],
@@ -26,7 +27,7 @@ export default class SetSign extends Component {
       divPos: [],
       isDataStored: false,
       signPos: [],
-      docId: 2,
+      docId: 4,
       creatorId: 2,
       clientImageHeight: null,
       clientImageWidth: null,
@@ -39,11 +40,11 @@ export default class SetSign extends Component {
       .then((response) => {
         let { selecteOptions, recipientList } = this.state;
         recipientList = response.data.data
-        selecteOptions = response.data.data.map(({ id, name }) => {
+        selecteOptions = response.data.data.map(({ id, name, email }) => {
           let value = id;
           let label = name;
           let docSignId = null;
-          return { value, label, docSignId };
+          return { value, label, docSignId, email };
         });
         this.setState({ recipientList, selecteOptions })
       })
@@ -106,7 +107,8 @@ export default class SetSign extends Component {
           let value = obj.recipient.id;
           let label = obj.recipient.name;
           let docSignId = obj.id;
-          return { value, label, docSignId };
+          let email = obj.recipient.email;
+          return { value, label, docSignId, email };
         });
         this.setState({ seletedRecipient, selecteOptions, doc_signs_data, isDataStored: true })
       })
@@ -123,12 +125,6 @@ export default class SetSign extends Component {
     aboutPage.pageLeft = event.target.offsetLeft;
     aboutPage.pageHeight = event.target.height;
     aboutPage.pageWidth = event.target.width;
-    // console.log("TCL: onDragOverCaptureImage -> page top", event.target.offsetTop)
-    // console.log("TCL: onDragOverCaptureImage -> page left", event.target.offsetLeft)
-    // console.log("TCL: onDragOverCaptureImage -> event.target.height", event.target.height)
-    // console.log("TCL: onDragOverCaptureImage -> event.target.width", event.target.width)
-    // console.log("TCL: onDragOverCaptureImage -> event.target.naturalHeight", event.target.naturalHeight)
-    // console.log("TCL: onDragOverCaptureImage -> event.target.naturalWidth", event.target.naturalWidth)
     this.setState({ aboutPage })
   }
 
@@ -186,7 +182,7 @@ export default class SetSign extends Component {
           <Row form>
             {
               imagePreviewUrl.length &&
-              <Dnd pageDetails={this.state.aboutPage} doc_signs_data={this.state.doc_signs_data} seletedRecipient={this.state.seletedRecipient} setImages={this.setImages()} />
+              <Dnd sender={this.state.sender} pageDetails={this.state.aboutPage} totalRecipients={this.state.selecteOptions} doc_signs_data={this.state.doc_signs_data} seletedRecipient={this.state.seletedRecipient} setImages={this.setImages()} />
             }
           </Row>
         </Form>

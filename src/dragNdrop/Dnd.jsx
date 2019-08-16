@@ -40,6 +40,7 @@ class Dnd extends Component {
             component.signXCoord = x - pageDetails.pageLeft;
             component.signYCoord = (y + document.documentElement.scrollTop) - pageDetails.pageTop;
             component.recipientId = seletedRecipient.value;
+            component.recipientEmail = seletedRecipient.email;
             component.docSignId = seletedRecipient.docSignId;
           }
           return component
@@ -52,6 +53,7 @@ class Dnd extends Component {
         copyDropedComponent.component.signXCoord = x - pageDetails.pageLeft;
         copyDropedComponent.component.signYCoord = (y + document.documentElement.scrollTop) - pageDetails.pageTop;
         copyDropedComponent.component.recipientId = seletedRecipient.value;
+        copyDropedComponent.component.recipientEmail = seletedRecipient.email;
         copyDropedComponent.component.docSignId = seletedRecipient.docSignId;
         newComponentsList = _.concat([], components, copyDropedComponent.component)
       }
@@ -65,9 +67,10 @@ class Dnd extends Component {
 
   onSendFile = () => {
     const { components } = { ...this.state };
+    let payload = {}
     const { pageWidth, pageHeight } = this.props.pageDetails;
     if (components.length) {
-      let payload = components.map((obj) => {
+      payload.docSignLogs = components.map((obj) => {
         let docSignId = obj.docSignId;
         let pageNo = obj.pageId;
         let signCoord = obj.signXCoord + ',' + obj.signYCoord;
@@ -76,6 +79,8 @@ class Dnd extends Component {
         let statusDate = Date.now();
         return { docSignId, pageNo, signCoord, pageRatio, statusId, statusDate };
       });
+      payload.recipientsList = this.props.totalRecipients;
+      payload.sender = this.props.sender;
       axios.post(`${baseUrl}/signlogs`, payload)
         .then((response) => {
           toastSuccess(response.data.message)

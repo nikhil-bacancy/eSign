@@ -8,7 +8,9 @@ const routes = (
     <>
         <Switch>
             <Route exact path="/" component={FileUpload} />
+
             <Route exact path="/sender/setsign" component={SetSign} />
+
             <Route exact path="/recipient/sign" component={DoSign} />
         </Switch>
     </>

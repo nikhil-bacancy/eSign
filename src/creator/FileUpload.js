@@ -16,14 +16,14 @@ class FileUpload extends Component {
       },
       recipients: [
         {
-          name: "avani",
+          name: "hiren panchal",
           phoneNumber: "7894564645",
-          email: "avanish.patel@bacancytechnology.com",
+          email: "hiren.panchal@bacancytechnology.com",
         },
         {
-          name: "komal",
+          name: "himanshu dudhat",
           phoneNumber: "7845125688",
-          email: "komal.kanada@bacancytechnology.com",
+          email: "himanshu.dudhat@bacancytechnology.com",
         }
       ],
       sender: {
