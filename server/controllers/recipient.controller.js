@@ -53,6 +53,35 @@ exports.create = async (req, res) => {
 }
 
 
+exports.update = async (req, res) => {
+  const recipientID = req.params.id;
+  await recipients.update(
+    { email: req.body.email },
+    { where: { id: recipientID }, returning: true, pain: true }
+  ).then(([rowAffected, data]) => {
+    if (rowAffected) {
+      return res.status(200).json({
+        status: true,
+        message: 'recipient details updated successfully.',
+        data: data,
+      });
+    } else {
+      return res.status(500).json({
+        status: false,
+        message: 'recipient update Unsuccessful / check Id.',
+        data: data,
+      });
+    }
+  }).catch((err) => {
+    return res.status(500).json({
+      status: false,
+      message: 'internal server error.',
+      details: err.toString(),
+    });
+  });
+}
+
+
 exports.getRecipientList = async function (req, res) {
   let recipientsData;
 

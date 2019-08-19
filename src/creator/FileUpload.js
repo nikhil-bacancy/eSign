@@ -21,9 +21,9 @@ class FileUpload extends Component {
           email: "hiren.panchal@bacancytechnology.com",
         },
         {
-          name: "himanshu dudhat",
-          phoneNumber: "7845125688",
-          email: "himanshu.dudhat@bacancytechnology.com",
+          name: "nikhil patel",
+          phoneNumber: "9998453840",
+          email: "nikhilpatel26195@gmail.com",
         }
       ],
       sender: {

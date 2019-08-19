@@ -99,7 +99,6 @@ export default class SetSign extends Component {
   onsetDocSign = () => {
     axios.post(`${baseUrl}/docsing/`, this.state.doc_signs_data)
       .then((response) => {
-        toastSuccess(response.data.message)
         let { doc_signs_data, selecteOptions, seletedRecipient } = { ...this.state };
         doc_signs_data = response.data.data
         seletedRecipient = null
@@ -111,6 +110,7 @@ export default class SetSign extends Component {
           return { value, label, docSignId, email };
         });
         this.setState({ seletedRecipient, selecteOptions, doc_signs_data, isDataStored: true })
+        toastSuccess(response.data.message)
       })
       .catch((error) => {
         toastError(error.message)

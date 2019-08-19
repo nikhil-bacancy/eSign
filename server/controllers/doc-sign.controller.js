@@ -2,7 +2,6 @@ const DocModifier = require('../utils/test');
 const db = require('../models/index');
 var _ = require('lodash');
 const middleware = require('../helper/middleware');
-const emailer = require('../helper/emailer');
 const doc_signs = db.doc_signs;
 const recipients = db.recipients;
 const creators = db.creators;
@@ -208,20 +207,20 @@ exports.getDocSignDetails = (req, res) => {
       return res.status(200).json({
         status: response ? true : false,
         message: 'Doc Sign Data Fetched Successfully..!',
-        details: response,
+        data: response.dataValues,
       });
     }).catch(error => {
       return res.status(500).json({
         status: false,
         message: 'Internal server error',
-        details: error,
+        error,
       });
     });
   }).catch(error => {
     return res.status(500).json({
       status: false,
       message: 'Token Has Expired.!',
-      details: error,
+      error,
     });
   });
 }

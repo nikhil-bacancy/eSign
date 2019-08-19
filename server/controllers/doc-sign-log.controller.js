@@ -65,9 +65,9 @@ exports.addSignLogDetais = async (req, res) => {
       let to = req.body.recipientsList[index].email;
       let subject = "Testing Email From Nikhil Patel";
       let bodyText = "Kindly Click On Given Link.!";
-      let html = `<a href="${process.env.APP_LINK}/recipient/sign?token=${token}">ESign Document Signature Link</a>`;
+      let html = `<p>${bodyText}</p><a href="${process.env.APP_LINK}/recipient/sign?token=${token}">ESign Document Signature Link</a>`;
 
-      emailer.sendEMail(from, to, subject, bodyText, html).then(respose => {
+      emailer.sendEMail(from, to, subject, null, html).then(respose => {
         counter++;
         if (counter === RecipientTokens.length) {
           return res.status(200).json({
@@ -86,6 +86,26 @@ exports.addSignLogDetais = async (req, res) => {
       status: error.status,
       message: error.message,
       details: error.details,
+    });
+  });
+}
+
+
+exports.getSignLogsByDocSignId = (req, res) => {
+  sign_logs.findAll({
+    where: { docSignId: req.params.id },
+    attributes: { exclude: ['createdAt', 'updatedAt'] },
+  }).map(el => el.get({ plain: true })).then((response) => {
+    return res.status(200).json({
+      status: response.length ? true : false,
+      message: response.length ? 'Doc Sign Logs Data Found..!' : 'Doc Sign Logs Data Not Found..!',
+      data: response,
+    });
+  }).catch(error => {
+    return res.status(500).json({
+      status: false,
+      message: 'Internal server error',
+      error: error.original,
     });
   });
 }
