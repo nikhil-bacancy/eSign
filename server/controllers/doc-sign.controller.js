@@ -59,8 +59,8 @@ const docsCreateBulk = (req) => {
   })
 }
 
-exports.create = async (req, res) => {
-  await docsCreateBulk(req).then((data) => {
+exports.create = (req, res) => {
+  docsCreateBulk(req).then((data) => {
     return res.status(200).json({
       status: data.status,
       message: data.message,

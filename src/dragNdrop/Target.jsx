@@ -5,7 +5,8 @@ import DraggableBox from "./DraggableBox";
 
 class Target extends Component {
     render() {
-        const { connectDropTarget, components, onDrop, setImages } = this.props;
+        const { connectDropTarget, components, onDrop, setImages, pageDetails } = this.props;
+
         return (
             connectDropTarget(
                 <div className="target flex-grow-1">
@@ -13,7 +14,7 @@ class Target extends Component {
                         setImages.length && setImages
                     }
                     {
-                        components.map((componentObj, index) => <DraggableBox key={index} onUpdate={onDrop} {...components[index]} />)
+                        components.map((componentObj, index) => <DraggableBox key={index} onUpdate={onDrop} pageDetails={pageDetails} {...components[index]} />)
                     }
                 </div>
             )
@@ -24,6 +25,7 @@ class Target extends Component {
 const spec = {
     drop(props, monitor, component) {
         const item = monitor.getItem()
+        console.log("TCL: drop -> item", item)
         const clientOffset = monitor.getClientOffset()
         props.onDrop(item, clientOffset.x, clientOffset.y)
     },

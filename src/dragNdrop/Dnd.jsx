@@ -3,7 +3,9 @@ import Source from './Source';
 import axios from "axios";
 import Target from './Target';
 import { DndProvider } from 'react-dnd';
+import { isMobile } from 'react-device-detect';
 import HTML5Backend from 'react-dnd-html5-backend';
+import TouchBackend from 'react-dnd-touch-backend'
 import _ from 'lodash';
 import './Dnd.css';
 import './source.css';
@@ -99,14 +101,14 @@ class Dnd extends Component {
 
   render() {
     const { components } = this.state;
-    const { setImages } = this.props;
+    const { setImages, pageDetails } = this.props;
     return (
       <>
         <Button color="warning" onClick={this.onSendFile} className="mb-5">Send File</Button>
-        <DndProvider backend={HTML5Backend}>
+        <DndProvider backend={(isMobile) ? TouchBackend : HTML5Backend}>
           <div className="Dnd">
-            <Source baseComponents={this.state.baseComponents} />
-            <Target onDrop={this.onDrop} components={components} setImages={setImages} />
+            <Source pageDetails={pageDetails} baseComponents={this.state.baseComponents} />
+            <Target onDrop={this.onDrop} pageDetails={pageDetails} components={components} setImages={setImages} />
           </div>
         </DndProvider>
       </>

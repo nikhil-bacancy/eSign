@@ -21,10 +21,28 @@
     background: #eee;
 }
 
+.basecomponentOutterDiv{
+    display: flex;
+    height: 50px;
+    width: 130px;
+}
+
 .basecomponent {
     /* border: 1px dashed #eee;  */
-    height: 60px; 
-    width: 62px;  
+    height: inherit; 
+    width: inherit;  
+    background-image: url(signature.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: black;
+}
+
+
+.basecomponentOld {
+    /* border: 1px dashed #eee;  */
+    height: 40px; 
+    width: 108px;  
     background-image: url(signature.png);
     background-size: cover;
     background-color: black;

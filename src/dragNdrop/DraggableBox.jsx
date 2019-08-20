@@ -2,20 +2,21 @@ import React from 'react'
 import { useDrag } from 'react-dnd'
 import ReactHtmlParser from 'react-html-parser';
 
-function getStyles(left, top, isDragging) {
+function getStyles(left, top, isDragging, pageDetails) {
+  const { pageHeight, pageWidth } = pageDetails
   return {
     position: 'absolute',
     left: left,
     top: top,
+    height: (pageHeight / 35) + 'px',
+    width: (pageWidth / 9) + 'px',
     cursor: 'move',
     opacity: isDragging ? 0.5 : 1,
-    height: isDragging ? 0 : '',
   }
 }
 
 export default function DraggableBox(props) {
-  const { id, title, left, top, component, onUpdate } = props
-
+  const { id, title, left, top, component, onUpdate, pageDetails } = props
   const [{ isDragging }, drag,] = useDrag({
     item: { type: component, id, left, top, title, component },
     collect: monitor => ({
@@ -28,7 +29,7 @@ export default function DraggableBox(props) {
   })
 
   return (
-    <div ref={drag} style={getStyles(left, top, isDragging)}>
+    <div ref={drag} style={getStyles(left, top, isDragging, pageDetails)}>
       {
         ReactHtmlParser(component)
       }

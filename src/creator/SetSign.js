@@ -35,7 +35,19 @@ export default class SetSign extends Component {
     };
   }
 
+  componentWillUnmount = () => {
+    window.removeEventListener("resize", this.updateDimensions);
+  }
+
+  updateDimensions = () => {
+    let { aboutPage } = { ...this.state }
+    aboutPage.pageHeight = document.getElementById('pg-1').clientHeight;
+    aboutPage.pageWidth = document.getElementById('pg-1').clientWidth;
+    this.setState({ aboutPage })
+  }
+
   componentDidMount = () => {
+    window.addEventListener("resize", this.updateDimensions);
     axios.get(`${baseUrl}/getRecipientList/`)
       .then((response) => {
         let { selecteOptions, recipientList } = this.state;
@@ -128,8 +140,18 @@ export default class SetSign extends Component {
     this.setState({ aboutPage })
   }
 
+  onPageLoad = (event) => {
+    let { aboutPage } = { ...this.state }
+    aboutPage.pageId = event.target.id;
+    aboutPage.pageTop = event.target.offsetTop;
+    aboutPage.pageLeft = event.target.offsetLeft;
+    aboutPage.pageHeight = event.target.height;
+    aboutPage.pageWidth = event.target.width;
+    this.setState({ aboutPage })
+  }
+
   setImages = () => {
-    return this.state.imagePreviewUrl.map((img, index) => <div key={index + 1} className='d-flex mt-3 bg-secondary'><img width={"100%"} className={"pdfpage"} id={'pg-' + (index + 1)} onDragEnter={this.onDragOverCaptureImage} src={'http://192.168.1.49:8000/upload/' + img} alt={index + 1} /></div>);
+    return this.state.imagePreviewUrl.map((img, index) => <div key={index + 1} className='d-flex mt-3 bg-secondary'><img width={"100%"} className={"pdfpage"} id={'pg-' + (index + 1)} onLoadCapture={this.onPageLoad} onDragEnter={this.onDragOverCaptureImage} src={'http://192.168.1.49:8000/upload/' + img} alt={index + 1} /></div>);
   }
 
   render() {

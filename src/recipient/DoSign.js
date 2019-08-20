@@ -91,10 +91,8 @@ class DoSign extends Component {
 
   renderSignOnPosition = () => {
     let { aboutPage } = { ...this.state }
-    // console.log("TCL: DoSign -> renderSignOnPosition -> aboutPage", aboutPage)
     // if (aboutPage.length > 0) {
     return this.state.signLogs.map((signLog) => {
-      console.log("TCL: DoSign -> renderSignOnPosition -> signLog - pageNo", aboutPage[signLog.pageNo - 1].pageTop, signLog.pageNo)
       let pageRatio = signLog.pageRatio.split(',')
       let left = ((parseFloat(pageRatio[0]) * parseFloat(aboutPage[signLog.pageNo - 1].pageWidth)) + parseInt(aboutPage[signLog.pageNo - 1].pageLeft));
       let top = ((parseFloat(pageRatio[1]) * parseFloat(aboutPage[signLog.pageNo - 1].pageHeight)) + parseInt(aboutPage[signLog.pageNo - 1].pageTop));

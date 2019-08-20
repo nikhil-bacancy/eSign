@@ -56,7 +56,7 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   const recipientID = req.params.id;
   await recipients.update(
-    { email: req.body.email },
+    { email: req.body.email, name: req.body.name },
     { where: { id: recipientID }, returning: true, pain: true }
   ).then(([rowAffected, data]) => {
     if (rowAffected) {

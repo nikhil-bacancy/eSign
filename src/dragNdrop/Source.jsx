@@ -4,13 +4,24 @@ import './source.css';
 import ReactHtmlParser from 'react-html-parser';
 
 class Source extends React.Component {
+
+    getStyles = (pageheight, pagewidth) => {
+        return {
+            display: "flex",
+            height: (pageheight / 35) + 'px',
+            width: (pagewidth / 9) + 'px',
+            cursor: 'move',
+        }
+    }
+
     render() {
+        const { pageHeight, pageWidth } = this.props.pageDetails
         return (
             <div className="source">
                 <ul>
                     {
                         this.props.baseComponents.map((baseComponent, index) => {
-                            return <ListItem key={index} component={baseComponent} />
+                            return <ListItem key={index} style={this.getStyles(pageHeight, pageWidth)} component={baseComponent} />
                         })
                     }
                 </ul>
@@ -18,6 +29,7 @@ class Source extends React.Component {
         )
     }
 }
+
 
 const spec = {
     beginDrag(props, monitor, component) {
@@ -33,8 +45,8 @@ const collect = (connect, monitor) => {
 }
 
 const ListItem = DragSource("form-elements", spec, collect)(props => {
-    const { connectDragSource, component, } = props;
-    return connectDragSource(<li><div>{ReactHtmlParser(component.component)}</div></li>)
+    const { connectDragSource, component, style } = props;
+    return connectDragSource(<li><div style={style}>{ReactHtmlParser(component.component)}</div></li>)
 });
 
 
