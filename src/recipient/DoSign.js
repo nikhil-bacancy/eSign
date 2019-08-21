@@ -12,6 +12,13 @@ class DoSign extends Component {
     super(props);
     this.state = {
       aboutPage: [],
+      pageDetails: {
+        pageId: null,
+        pageTop: null,
+        pageLeft: null,
+        pageHeight: null,
+        pageWidth: null
+      },
       imagePreviewUrl: '',
       documentDetails: null,
       docId: null,
@@ -22,7 +29,19 @@ class DoSign extends Component {
     };
   }
 
+  componentWillUnmount = () => {
+    window.removeEventListener("resize", this.updateDimensions);
+  }
+
+  updateDimensions = () => {
+    let { pageDetails } = { ...this.state }
+    pageDetails.pageHeight = document.getElementById('pg-1').clientHeight;
+    pageDetails.pageWidth = document.getElementById('pg-1').clientWidth;
+    this.setState({ pageDetails })
+  }
+
   componentDidMount = () => {
+    window.addEventListener("resize", this.updateDimensions);
     this.onLoadPdf();
   }
 
@@ -64,7 +83,12 @@ class DoSign extends Component {
   }
 
   onLoadCaptureImage = (event) => {
-    let { aboutPage } = { ...this.state }
+    let { aboutPage, pageDetails } = { ...this.state }
+    pageDetails.pageId = event.target.id;
+    pageDetails.pageTop = event.target.offsetTop;
+    pageDetails.pageLeft = event.target.offsetLeft;
+    pageDetails.pageHeight = event.target.height;
+    pageDetails.pageWidth = event.target.width
     let obj = {
       pageId: event.target.id,
       pageTop: event.target.offsetTop,
@@ -73,32 +97,36 @@ class DoSign extends Component {
       pageWidth: event.target.width
     }
     aboutPage.push(obj)
-    this.setState({ aboutPage })
+    this.setState({ aboutPage, pageDetails })
   }
 
   setImages = () => {
     return this.state.imagePreviewUrl.map((img, index) => <div key={index + 1} className='d-flex m-3 bg-secondary'><img width={"100%"} className={"pdfpage"} id={'pg-' + (index + 1)} onLoadCapture={this.onLoadCaptureImage} src={'http://192.168.1.49:8000/upload/' + img} alt={index + 1} /></div>);
   }
 
-  getStyles = (left, top, ) => {
+  getStyles = (left, top, pageheight, pagewidth) => {
     return {
+      display: "flex",
+      left: left,
+      top: top,
+      height: (pageheight / 35),
+      width: (pagewidth / 9),
+      cursor: 'pointer',
       position: 'absolute',
-      left: left + 'px',
-      top: top + 'px',
-      cursor: 'move',
     }
   }
 
   renderSignOnPosition = () => {
-    let { aboutPage } = { ...this.state }
-    // if (aboutPage.length > 0) {
-    return this.state.signLogs.map((signLog) => {
-      let pageRatio = signLog.pageRatio.split(',')
-      let left = ((parseFloat(pageRatio[0]) * parseFloat(aboutPage[signLog.pageNo - 1].pageWidth)) + parseInt(aboutPage[signLog.pageNo - 1].pageLeft));
-      let top = ((parseFloat(pageRatio[1]) * parseFloat(aboutPage[signLog.pageNo - 1].pageHeight)) + parseInt(aboutPage[signLog.pageNo - 1].pageTop));
-      return <div className="sign" id={signLog.id} key={signLog.id} style={this.getStyles(left, top)}></div>
-    })
-    // }
+    let { aboutPage, pageDetails } = { ...this.state }
+    console.log("TCL: DoSign -> renderSignOnPosition -> pageDetails", pageDetails)
+    if (aboutPage.length > 0) {
+      return this.state.signLogs.map((signLog) => {
+        let pageRatio = signLog.pageRatio.split(',')
+        let left = ((parseFloat(pageRatio[0]) * parseFloat(pageDetails.pageWidth)) + parseInt(aboutPage[signLog.pageNo - 1].pageLeft));
+        let top = ((parseFloat(pageRatio[1]) * parseFloat(pageDetails.pageHeight)) + parseInt(aboutPage[signLog.pageNo - 1].pageTop));
+        return <div id={signLog.id} key={signLog.id} style={this.getStyles(left, top, pageDetails.pageHeight, pageDetails.pageWidth)}><div className="sign"></div></div>
+      })
+    }
   }
 
   render() {

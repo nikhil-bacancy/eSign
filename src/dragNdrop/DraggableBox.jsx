@@ -8,8 +8,8 @@ function getStyles(left, top, isDragging, pageDetails) {
     position: 'absolute',
     left: left,
     top: top,
-    height: (pageHeight / 35) + 'px',
-    width: (pageWidth / 9) + 'px',
+    height: (pageHeight / 35),
+    width: (pageWidth / 9),
     cursor: 'move',
     opacity: isDragging ? 0.5 : 1,
   }

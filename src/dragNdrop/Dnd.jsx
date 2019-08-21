@@ -29,34 +29,38 @@ class Dnd extends Component {
 
   onDrop = (dropedComponent, x, y) => {
     const { components } = this.state;
-    const { seletedRecipient, pageDetails } = this.props;
+    const { currentRecipient, pageDetails } = this.props;
     const copyDropedComponent = JSON.parse(JSON.stringify(dropedComponent));
     let newComponentsList;
-    if (seletedRecipient) {
+    if (currentRecipient) {
+
+      let left = (x - ((pageDetails.pageWidth / 9) / 2));
+      let top = ((y - ((pageDetails.pageHeight / 35) / 2)) + window.pageYOffset);//document.documentElement.scrollTop);
+
       if (copyDropedComponent.id !== undefined) {
         newComponentsList = components.map((component) => {
           if (component.id === copyDropedComponent.id) {
             component.pageId = parseInt(this.props.pageDetails.pageId.slice(3));
-            component.left = x
-            component.top = y + document.documentElement.scrollTop
-            component.signXCoord = x - pageDetails.pageLeft;
-            component.signYCoord = (y + document.documentElement.scrollTop) - pageDetails.pageTop;
-            component.recipientId = seletedRecipient.value;
-            component.recipientEmail = seletedRecipient.email;
-            component.docSignId = seletedRecipient.docSignId;
+            component.left = left
+            component.top = top
+            component.signXCoord = (left - pageDetails.pageLeft);
+            component.signYCoord = (top - pageDetails.pageTop);
+            component.recipientId = currentRecipient.value;
+            component.recipientEmail = currentRecipient.email;
+            component.docSignId = currentRecipient.docSignId;
           }
           return component
         })
       } else {
         copyDropedComponent.component.id = components.length;
         copyDropedComponent.component.pageId = parseInt(this.props.pageDetails.pageId.slice(3));
-        copyDropedComponent.component.left = x;
-        copyDropedComponent.component.top = y + document.documentElement.scrollTop;
-        copyDropedComponent.component.signXCoord = x - pageDetails.pageLeft;
-        copyDropedComponent.component.signYCoord = (y + document.documentElement.scrollTop) - pageDetails.pageTop;
-        copyDropedComponent.component.recipientId = seletedRecipient.value;
-        copyDropedComponent.component.recipientEmail = seletedRecipient.email;
-        copyDropedComponent.component.docSignId = seletedRecipient.docSignId;
+        copyDropedComponent.component.left = left
+        copyDropedComponent.component.top = top
+        copyDropedComponent.component.signXCoord = (left - pageDetails.pageLeft);
+        copyDropedComponent.component.signYCoord = (top - pageDetails.pageTop);
+        copyDropedComponent.component.recipientId = currentRecipient.value;
+        copyDropedComponent.component.recipientEmail = currentRecipient.email;
+        copyDropedComponent.component.docSignId = currentRecipient.docSignId;
         newComponentsList = _.concat([], components, copyDropedComponent.component)
       }
       this.setState({
@@ -91,7 +95,7 @@ class Dnd extends Component {
           toastError(error.message)
         });
     } else {
-      if (this.props.seletedRecipient) {
+      if (this.props.currentRecipient) {
         toastDefault("No Signature Found.!")
       } else {
         toastDefault("Please Select Recipient.!")

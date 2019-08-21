@@ -3,12 +3,20 @@
     min-height: 100vh;  
     background: gray;  
 }
+
+.basecomponentOutterDiv{
+    display: flex;
+    height: 50px;
+    width: 130px;
+}
+
 .sign {
-    /* border: 1px dashed #eee;  */
-    height: 60px; 
-    width: 62px;  
-    background-image: url(signature.png);
-    background-size: cover;
     position: absolute;
+    height: inherit; 
+    width: inherit;  
+    background-image: url(signature.png);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
     background-color: black;
 }

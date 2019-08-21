@@ -25,7 +25,6 @@ class Target extends Component {
 const spec = {
     drop(props, monitor, component) {
         const item = monitor.getItem()
-        console.log("TCL: drop -> item", item)
         const clientOffset = monitor.getClientOffset()
         props.onDrop(item, clientOffset.x, clientOffset.y)
     },

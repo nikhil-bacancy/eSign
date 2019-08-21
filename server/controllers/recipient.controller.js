@@ -52,6 +52,27 @@ exports.create = async (req, res) => {
   });
 }
 
+exports.findById = (recipientId) => {
+  return new Promise((resolve, reject) => {
+    recipients.findAll({
+      where: { id: recipientId },
+      raw: true,
+      attributes: ['id', 'name', 'email'],
+    }).then(([user]) => {
+      resolve({
+        status: true,
+        message: "recipient data fatch successfully..!",
+        data: user,
+      });
+    }).catch(error => {
+      reject({
+        status: false,
+        message: 'Internal server error',
+        details: error,
+      });
+    });
+  });
+}
 
 exports.update = async (req, res) => {
   const recipientID = req.params.id;

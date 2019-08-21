@@ -2,6 +2,7 @@ const DocModifier = require('../utils/test');
 const db = require('../models/index');
 var _ = require('lodash');
 const middleware = require('../helper/middleware');
+const recipientsFun = require('./recipient.controller');
 const doc_signs = db.doc_signs;
 const recipients = db.recipients;
 const creators = db.creators;
@@ -25,12 +26,6 @@ const docsCreateBulk = (req) => {
     _.each(req.body, (payload) => {
       doc_signs.findOrCreate({
         where: { documentId: payload.documentId, creatorId: payload.creatorId, recipientId: payload.recipientId },
-        include: [
-          {
-            model: recipients,
-            attributes: ['id', 'name', 'email'],
-            required: true,
-          }],
         defaults: {
           documentId: payload.documentId,
           creatorId: payload.creatorId,
@@ -38,10 +33,18 @@ const docsCreateBulk = (req) => {
           statusId: payload.statusId,
           statusDate: payload.statusDate,
         }
-      }).then(([data, created]) => {
+      }).then(async ([data, created]) => {
+        await recipientsFun.findById(payload.recipientId).then((finaldata) => {
+          data.dataValues.recipient = finaldata.data;
+        }).catch((error) => {
+          reject({
+            status: false,
+            message: 'Internal server error',
+            details: error,
+          });
+        });
         doc_sign.push(data);
-        counter++;
-        if (counter === req.body.length) {
+        if (++counter === req.body.length) {
           resolve({
             status: created,
             message: created ? 'Document sign data stored successfully.' : 'Document sign data already exist.',
