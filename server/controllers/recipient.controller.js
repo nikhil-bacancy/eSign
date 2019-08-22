@@ -20,7 +20,7 @@ const addRecipient = (req) => {
         if (counter === req.body.length) {
           resolve({
             status: created,
-            message: created ? 'Sender information stored successfully.' : 'Sender data already exist.',
+            message: created ? 'Recipient information stored successfully.' : 'Recipient data already exist.',
             data: recipient_details,
           });
         }

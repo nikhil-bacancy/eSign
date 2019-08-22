@@ -2,12 +2,13 @@ import React, { Component } from "react";
 import axios from "axios";
 import Select from "react-select";
 import Dnd from "../dragNdrop/Dnd";
+import { withRouter } from 'react-router-dom';
 import { Form, Input, FormGroup, Label, Col, Row, Button } from 'reactstrap';
 import '../App.css';
 import { toastSuccess, toastError } from "../NotificationToast";
 
 const baseUrl = process.env.REACT_APP_API_URL;
-export default class SetSign extends Component {
+class SetSign extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -48,6 +49,7 @@ export default class SetSign extends Component {
   }
 
   componentDidMount = () => {
+    const { location } = this.props;
     window.addEventListener("resize", this.updateDimensions);
     axios.get(`${baseUrl}/getRecipientList/`)
       .then((response) => {
@@ -59,16 +61,16 @@ export default class SetSign extends Component {
           let docSignId = null;
           return { value, label, docSignId, email };
         });
-        this.setState({ recipientList, selecteOptions })
+        this.setState({ recipientList, selecteOptions, docId: location.state.doc.id, creatorId: location.state.creator.id })
       })
       .catch((error) => {
         console.log(error);
       });
-    this.onLoadPdf();
+    this.onLoadPdf(location.state.doc.id);
   }
 
-  onLoadPdf = () => {
-    axios.get(`${baseUrl}/getDoc/${this.state.docId}`)
+  onLoadPdf = (docId) => {
+    axios.get(`${baseUrl}/getDoc/${docId}`)
       .then((response) => {
         if (response.data.data) {
           this.setState({ imagePreviewUrl: response.data.data })
@@ -243,6 +245,7 @@ export default class SetSign extends Component {
   }
 }
 
+export default withRouter(SetSign);
 // onSendFile = () => {
 //   const payload = {
 //     pageNo: this.state.pageNumber - 1,

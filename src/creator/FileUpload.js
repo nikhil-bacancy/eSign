@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
-  import { withRouter } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import { toastError, toastSuccess } from '../NotificationToast';
 const baseUrl = process.env.REACT_APP_API_URL;
 
@@ -9,19 +9,34 @@ class FileUpload extends Component {
     super(props);
     this.state = {
       creator: {
-        name: "nikhil",
+        id: null,
+        name: "nikhil patel",
         phoneNumber: "8866210229",
         email: "nikhil.patel@bacancytechnology.com",
         password: "nik13"
       },
       recipients: [
         {
+          id: null,
           name: "hiren panchal",
           phoneNumber: "7894564645",
           email: "hiren.panchal@bacancytechnology.com",
         },
         {
-          name: "nikhil patel",
+          id: null,
+          name: "shivangi bhatt",
+          phoneNumber: "7894564645",
+          email: "shivangi.bhatt@bacancytechnology.com",
+        },
+        {
+          id: null,
+          name: "komal kanada",
+          phoneNumber: "7894564645",
+          email: "komal.kanada@bacancytechnology.com",
+        },
+        {
+          id: null,
+          name: "Jn patel",
           phoneNumber: "9998453840",
           email: "nikhilpatel26195@gmail.com",
         }
@@ -49,6 +64,9 @@ class FileUpload extends Component {
     if (this.state.creator.name) {
       axios.post(`${baseUrl}/creator/`, this.state.creator)
         .then((res) => {
+          let { creator } = this.state
+          creator.id = res.data.data.id
+          this.setState({ creator })
           toastSuccess(res.data.message)
         })
         .catch((error) => {
@@ -62,6 +80,11 @@ class FileUpload extends Component {
     if (this.state.recipients.length) {
       axios.post(`${baseUrl}/recipients/`, this.state.recipients)
         .then((res) => {
+          let { recipients } = this.state
+          res.data.data.forEach((obj, index) => {
+            recipients[index].id = obj.id
+          });
+          this.setState({ recipients })
           toastSuccess(res.data.message)
         })
         .catch((error) => {
@@ -75,8 +98,12 @@ class FileUpload extends Component {
     const { history } = this.props;
     if (this.state.sender.docFile) {
       axios.post(`${baseUrl}/uploadfile/`, this.formdataCoverter(this.state.sender))
-        .then(() => {
-          history.push(`/sender/setsign`)
+        .then((response) => {
+          history.push({
+            pathname: '/sender/setsign',
+            search: '',
+            state: { doc: response.data.data, creator: this.state.creator }
+          })
         })
         .catch((error) => {
           console.log(error);
@@ -102,8 +129,8 @@ class FileUpload extends Component {
     return (
       <div>
         <center>
-          <h1>--------------------- ADD CREATOR ---------------------</h1>
-          <input type='button' value='add new creator' onClick={this.onAddNewCreator} /><br /><br />
+          <h1>--------------------- ADD SENDER ---------------------</h1>
+          <input type='button' value='add new sender' onClick={this.onAddNewCreator} /><br /><br />
           <h1>--------------------- ADD RECIPIENTS ---------------------</h1>
           <input type='button' value='add new recipients' onClick={this.onAddNewRecipients} /><br /><br />
           <h1>--------------------- UPLOAD YOUR DOCUMENT ---------------------</h1>
