@@ -11,7 +11,7 @@ class Target extends Component {
             connectDropTarget(
                 <div className="target flex-grow-1">
                     {
-                        setImages.length && setImages
+                        (setImages.length > 0) && setImages
                     }
                     {
                         components.map((componentObj, index) => <DraggableBox key={index} onUpdate={onDrop} pageDetails={pageDetails} {...components[index]} />)

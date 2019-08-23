@@ -20,7 +20,6 @@ app.use(bodyParser.json({ limit: '50mb' }));
 
 app.use('/', express.static('./public'));
 app.use('/upload', express.static('./upload'));
-
 app.set('view engine', 'ejs');
 
 app.use((req, res, next) => {

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import axios from "axios";
 import { withRouter } from 'react-router-dom';
 import { toastError, toastSuccess } from '../NotificationToast';
+// import { Document, Page } from 'react-pdf';
 const baseUrl = process.env.REACT_APP_API_URL;
 
 class FileUpload extends Component {
@@ -41,8 +42,9 @@ class FileUpload extends Component {
           email: "nikhilpatel26195@gmail.com",
         }
       ],
+      pageNumber: 0,
       sender: {
-        name: "nikhil",
+        name: "nikhil patel",
         phoneNumber: "8866210229",
         email: "nikhil.patel@bacancytechnology.com",
         docFile: null,
@@ -51,6 +53,11 @@ class FileUpload extends Component {
     };
   }
 
+  onDocumentLoadSuccess = ({ numPages }) => {
+    let { sender } = this.state;
+    sender.totalPages = numPages;
+    this.setState({ sender });
+  }
 
   formdataCoverter = (payload) => {
     let formdata = new FormData();
@@ -114,18 +121,19 @@ class FileUpload extends Component {
   handleChange = (event) => {
     let sender = { ...this.state.sender }
     let file = event.target.files[0];
-    let reader = new FileReader();
-    if (file.type === 'application/pdf') {
-      sender.docFile = file;
-      reader.readAsBinaryString(file);
-      reader.onloadend = () => {
-        sender.totalPages = reader.result.match(/\/Type[\s]*\/Page[^s]/g).length;
-      }
-    }
+    sender.docFile = file;
+    // let reader = new FileReader();
+    // if (file.type === 'application/pdf') {
+    //   reader.readAsBinaryString(file);
+    //   reader.onloadend = () => {
+    //     sender.totalPages = reader.result.match(/\/Type[\s]*\/Page[^s]/g).length;
+    //   }
+    // }
     this.setState({ sender })
   }
 
   render() {
+    const { sender, pageNumber } = this.state;
     return (
       <div>
         <center>
@@ -137,9 +145,18 @@ class FileUpload extends Component {
           <form encType="multipart/form-data">
             <input type="file" name="docFile" onChange={(e) => this.handleChange(e)} />
             <input type='button' value='Upload File' onClick={this.onuploadFile} /><br /><br />
-          </form>
-        </center>
-      </div>
+            <div>
+              {/* <Document
+                file={sender.docFile}
+                onLoadSuccess={this.onDocumentLoadSuccess}
+              >
+                 <Page pageNumber={pageNumber} /> 
+              </Document>
+              <p>Page {pageNumber} of {sender.totalPages}</p> */}
+            </div>
+          </form >
+        </center >
+      </div >
     );
   }
 }

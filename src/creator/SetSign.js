@@ -29,8 +29,8 @@ class SetSign extends Component {
       divPos: [],
       isDataStored: false,
       signPos: [],
-      docId: 4,
-      creatorId: 2,
+      docId: null,
+      creatorId: null,
       clientImageHeight: null,
       clientImageWidth: null,
       doc_signs_data: [],
@@ -43,30 +43,35 @@ class SetSign extends Component {
 
   updateDimensions = () => {
     let { aboutPage } = { ...this.state }
-    aboutPage.pageHeight = document.getElementById('pg-1').clientHeight;
-    aboutPage.pageWidth = document.getElementById('pg-1').clientWidth;
-    this.setState({ aboutPage })
+    if (document.getElementById('pg-1')) {
+      aboutPage.pageHeight = document.getElementById('pg-1').clientHeight;
+      aboutPage.pageWidth = document.getElementById('pg-1').clientWidth;
+      this.setState({ aboutPage })
+    }
   }
 
   componentDidMount = () => {
     const { location } = this.props;
     window.addEventListener("resize", this.updateDimensions);
+    let { selecteOptions, recipientList, docId, creatorId, sender } = this.state;
     axios.get(`${baseUrl}/getRecipientList/`)
       .then((response) => {
-        let { selecteOptions, recipientList } = this.state;
         recipientList = response.data.data
+        docId = location.state.doc.id ? location.state.doc.id : docId;
+        creatorId = location.state.creator.id ? location.state.creator.id : creatorId;
+        sender = location.state.creator ? location.state.creator : sender;
         selecteOptions = response.data.data.map(({ id, name, email }) => {
           let value = id;
           let label = name;
           let docSignId = null;
           return { value, label, docSignId, email };
         });
-        this.setState({ recipientList, selecteOptions, docId: location.state.doc.id, creatorId: location.state.creator.id })
+        this.setState({ recipientList, selecteOptions, docId, creatorId, sender }, this.onLoadPdf(docId))
       })
       .catch((error) => {
         console.log(error);
       });
-    this.onLoadPdf(location.state.doc.id);
+
   }
 
   onLoadPdf = (docId) => {
@@ -182,7 +187,7 @@ class SetSign extends Component {
   }
 
   setImages = () => {
-    return this.state.imagePreviewUrl.map((img, index) => <div key={index + 1} className='d-flex mt-3 bg-secondary'><img width={"100%"} className={"pdfpage"} id={'pg-' + (index + 1)} onLoadCapture={this.onPageLoad} onDragEnter={this.onDragOverCaptureImage} src={'http://192.168.1.49:8000/upload/' + img} alt={index + 1} /></div>);
+    return this.state.imagePreviewUrl.map((img, index) => <div key={index + 1} className='d-flex mt-3 bg-white'><img width={"100%"} className={"pdfpage"} id={'pg-' + (index + 1)} onLoadCapture={this.onPageLoad} onDragEnter={this.onDragOverCaptureImage} src={'http://192.168.1.49:8000/upload/' + img} alt={index + 1} /></div>);
   }
 
   render() {
@@ -190,7 +195,7 @@ class SetSign extends Component {
     return (
       <>
         <Form className='m-5' id='setsignForm'>
-          {!isDataStored &&
+          {(!isDataStored) ?
             <Row form>
               <Col md={6}>
                 <FormGroup>
@@ -213,21 +218,22 @@ class SetSign extends Component {
                 </>
               </Col>
             </Row>
+            :
+            <Row form>
+              <Col md={6}>
+                <Label className="text-secondary text-capitalize d-block">All Finalized Recipients For Doc Sign : </Label>
+                {this.state.seletedRecipientsList.map((obj, index) => {
+                  return (
+                    <FormGroup check key={index} inline>
+                      <Label check key={obj.value} className={"pr-2 text-uppercase text-info"} size="md">
+                        <Input type="radio" name="finalizedrecipients" onChange={this.onCheckedChange} id={obj.docSignId} value={obj.value} email={obj.email} key={obj.email} about={obj.label} docsignid={obj.docSignId} />{' '}{obj.label}
+                      </Label>
+                    </FormGroup>
+                  )
+                })}
+              </Col>
+            </Row>
           }
-          <Row form>
-            <Col md={6}>
-              <Label className="text-secondary text-capitalize d-block">All Finalized Recipients For Doc Sign : </Label>
-              {this.state.seletedRecipientsList.map((obj, index) => {
-                return (
-                  <FormGroup check key={index} inline>
-                    <Label check key={obj.value} className={"pr-2 text-uppercase text-info"} size="md">
-                      <Input type="radio" name="finalizedrecipients" onChange={this.onCheckedChange} id={obj.docSignId} value={obj.value} email={obj.email} key={obj.email} about={obj.label} docsignid={obj.docSignId} />{' '}{obj.label}
-                    </Label>
-                  </FormGroup>
-                )
-              })}
-            </Col>
-          </Row>
           <Row form>
             <Col md={12}>
               <center><Label size="lg" className='align text-uppercase'> File Viewer</Label></center>
@@ -235,8 +241,10 @@ class SetSign extends Component {
           </Row>
           <Row form>
             {
-              imagePreviewUrl.length &&
-              <Dnd sender={this.state.sender} pageDetails={this.state.aboutPage} totalRecipients={this.state.selecteOptions} doc_signs_data={this.state.doc_signs_data} currentRecipient={this.state.currentRecipient} setImages={this.setImages()} />
+              (imagePreviewUrl.length > 0) ?
+                <Dnd sender={this.state.sender} pageDetails={this.state.aboutPage} totalRecipients={this.state.selecteOptions} doc_signs_data={this.state.doc_signs_data} currentRecipient={this.state.currentRecipient} setImages={this.setImages()} />
+                :
+                <b>Document Not Found.!</b>
             }
           </Row>
         </Form>

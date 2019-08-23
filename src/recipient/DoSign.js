@@ -142,7 +142,7 @@ class DoSign extends Component {
 
   setImages = () => {
     return this.state.imagePreviewUrl.map((img, index) => {
-      return <div key={index + 1} className='d-flex m-3 bg-secondary'>
+      return <div key={index + 1} className='d-flex m-3 bg-white'>
         <img
           width={"100%"}
           className={"pdfpage"}
@@ -189,7 +189,7 @@ class DoSign extends Component {
                 <center><Label size="lg" className='align text-primary text-uppercase'><Label className="text-secondary">-  Sender :</Label> {documentDetails.sender} </Label></center>
               </Col>
               <Col md={4}>
-                <center><Label size="lg" className='align text-primary text-uppercase'><Label className="text-secondary">-  Doc Name :</Label> {documentDetails.name} </Label></center>
+                <center><Label size="lg" className='align text-primary text-uppercase'><Label className="text-secondary">-  Doc Name -</Label> <br />{documentDetails.name} </Label></center>
               </Col>
               <Col md={4}>
                 <center><Label size="lg" className='align text-primary text-uppercase'><Label className="text-secondary">-  Total Pages :</Label> {documentDetails.totalPages} </Label></center>
