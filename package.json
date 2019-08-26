@@ -18,6 +18,7 @@
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.0.1",
     "react-select": "^3.0.4",
+    "react-signature-canvas": "^1.0.3",
     "react-toastify": "^5.3.2",
     "reactstrap": "^8.0.1"
   },

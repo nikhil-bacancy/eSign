@@ -2,8 +2,10 @@ import React, { Component } from "react";
 import axios from "axios";
 import { withRouter } from 'react-router-dom';
 import { toastError, toastSuccess } from '../NotificationToast';
-// import { Document, Page } from 'react-pdf';
+import { Document, Page, pdfjs } from 'react-pdf';
+import { Button } from 'reactstrap';
 const baseUrl = process.env.REACT_APP_API_URL;
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 class FileUpload extends Component {
   constructor(props) {
@@ -42,7 +44,7 @@ class FileUpload extends Component {
           email: "nikhilpatel26195@gmail.com",
         }
       ],
-      pageNumber: 0,
+      pageNumber: 1,
       sender: {
         name: "nikhil patel",
         phoneNumber: "8866210229",
@@ -118,6 +120,14 @@ class FileUpload extends Component {
     }
   }
 
+  changePage = offset => this.setState(prevState => ({
+    pageNumber: prevState.pageNumber + offset,
+  }));
+
+  previousPage = () => this.changePage(-1);
+
+  nextPage = () => this.changePage(1);
+
   handleChange = (event) => {
     let sender = { ...this.state.sender }
     let file = event.target.files[0];
@@ -145,15 +155,31 @@ class FileUpload extends Component {
           <form encType="multipart/form-data">
             <input type="file" name="docFile" onChange={(e) => this.handleChange(e)} />
             <input type='button' value='Upload File' onClick={this.onuploadFile} /><br /><br />
-            <div>
-              {/* <Document
-                file={sender.docFile}
-                onLoadSuccess={this.onDocumentLoadSuccess}
-              >
-                 <Page pageNumber={pageNumber} /> 
-              </Document>
-              <p>Page {pageNumber} of {sender.totalPages}</p> */}
-            </div>
+            {(sender.docFile != null) &&
+              <>
+                <div className={"my-2"}>
+                  <p>
+                    Page {pageNumber || (sender.totalPages ? 1 : '--')} of {sender.totalPages || '--'}
+                  </p>
+                  <Button
+                    className={"mx-1"}
+                    disabled={pageNumber <= 1}
+                    onClick={this.previousPage}>Previous</Button>
+                  <Button
+                    className={"mx-1"}
+                    disabled={pageNumber >= sender.totalPages}
+                    onClick={this.nextPage}>Next</Button>
+                </div>
+                <div>
+                  <Document
+                    file={sender.docFile}
+                    onLoadSuccess={this.onDocumentLoadSuccess} >
+                    <Page pageNumber={pageNumber} />
+                  </Document>
+                  <p>Page {pageNumber} of {sender.totalPages}</p>
+                </div>
+              </>
+            }
           </form >
         </center >
       </div >

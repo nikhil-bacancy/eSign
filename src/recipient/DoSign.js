@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Form, Label, Col, Row } from 'reactstrap';
+import { Form, Label, Col, Row, Button } from 'reactstrap';
 import './recipient.css';
 import queryString from "query-string";
 import { withRouter } from 'react-router-dom';
 import { toastError } from "../NotificationToast";
+import SignModal from "../popupModals/SignModal";
+const signImg = require('./samplesign.png');
 
 
 const baseUrl = process.env.REACT_APP_API_URL;
@@ -20,6 +22,9 @@ class DoSign extends Component {
         pageHeight: null,
         pageWidth: null
       },
+      signatureUrl: null,
+      open: false,
+      isSignSet: false,
       isLoading: true,
       imagePreviewUrl: '',
       documentDetails: null,
@@ -178,23 +183,54 @@ class DoSign extends Component {
     })
   }
 
+  toggle = () => {
+    this.setState(({ open }) => ({ open: !open }));
+  }
+
+  onUploadSign = (isUpload, signatureUrl) => {
+    this.setState({ isSignSet: isUpload, signatureUrl });
+  }
+
   render() {
-    const { imagePreviewUrl, documentDetails, signLogs, aboutPage, isLoading } = this.state;
+    const { imagePreviewUrl, documentDetails, signLogs, aboutPage, isLoading, isSignSet, signatureUrl } = this.state;
     return (
       <>
-        <Form className='m-5' id='setsignForm'>
+        <SignModal toggle={this.toggle} open={this.state.open} onUploadSign={this.onUploadSign} />
+        <Form className='mx-5' id='setsignForm'>
           {documentDetails !== null &&
-            < Row form>
-              <Col md={4}>
-                <center><Label size="lg" className='align text-primary text-uppercase'><Label className="text-secondary">-  Sender :</Label> {documentDetails.sender} </Label></center>
-              </Col>
-              <Col md={4}>
-                <center><Label size="lg" className='align text-primary text-uppercase'><Label className="text-secondary">-  Doc Name -</Label> <br />{documentDetails.name} </Label></center>
-              </Col>
-              <Col md={4}>
-                <center><Label size="lg" className='align text-primary text-uppercase'><Label className="text-secondary">-  Total Pages :</Label> {documentDetails.totalPages} </Label></center>
-              </Col>
-            </Row>
+            <>
+              <Row form className="bg-secondary sticky-top">
+                <Col md={12} color="primary">
+                  <div style={{ height: "60px" }} className="d-flex flex-row align-items-center">
+                    <div className="mr-3">
+                      <Label size="sm" className='align text-white text-uppercase m-0'>- Select Signature For The Document :</Label>
+                    </div>
+                    <div className="mr-3">
+                      <div className="bg-white"><img src={signatureUrl ? signatureUrl : signImg} width="140px" height="45px" alt="not found" /></div>
+                    </div>
+                    <div className="mr-3">
+                      {
+                        isSignSet ?
+                          <Button color="warning" onClick={this.toggle}>Edit</Button>
+                          :
+                          <Button color="primary" onClick={this.toggle}>Select Signature</Button>
+                      }
+                    </div>
+                  </div>
+                </Col>
+              </Row>
+              < Row form>
+                <Col md={4}>
+                  <center><Label size="lg" className='align text-primary text-uppercase'><Label className="text-secondary">-  Sender :</Label> {documentDetails.sender} </Label></center>
+                </Col>
+                <Col md={4}>
+                  <center><Label size="lg" className='align text-primary text-uppercase'><Label className="text-secondary">-  Doc Name -</Label> <br />{documentDetails.name} </Label></center>
+                </Col>
+                <Col md={4}>
+                  <center><Label size="lg" className='align text-primary text-uppercase'><Label className="text-secondary">-  Total Pages :</Label> {documentDetails.totalPages} </Label></center>
+                </Col>
+              </Row>
+            </>
           }
           <Row form>
             <Col md={12}>

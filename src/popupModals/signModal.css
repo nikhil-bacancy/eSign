@@ -1,0 +1,19 @@
+
+.sigContainer {
+  width: 100%;
+  height: 100%;
+  margin: .5rem 0 .5rem 0;
+  background-color:antiquewhite;
+}
+
+.sigPad {
+  width: 100%;
+  height: 100%;
+}
+
+.sigImage {
+  background-size: 200px 50px;
+  width: 200px;
+  height: 50px;
+  background-color: white;
+}
