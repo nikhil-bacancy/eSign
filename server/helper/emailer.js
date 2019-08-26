@@ -1,56 +1,55 @@
 const nodemailer = require("nodemailer");
 
 exports.sendEMail = (from, to, subject, bodyText, bodyHtml) => {
-  return new Promise((resolve, reject) => {
-    let transporter = nodemailer.createTransport({
-      // service: "Gmail",
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: {
-        user: process.env.EMAIL,
-        pass: process.env.PASSWORD
-      }
-    });
+	return new Promise((resolve, reject) => {
+		let transporter = nodemailer.createTransport({
+			// service: "Gmail",
+			host: "smtp.gmail.com",
+			port: 465,
+			secure: true,
+			auth: {
+				user: process.env.EMAIL,
+				pass: process.env.PASSWORD
+			}
+		});
 
-    let mailOptions = {
-      from: `"Esign"<${from}>`, // sender address
-      to, // list of receivers
-      subject, // Subject line
-      text: bodyText && bodyText, // plain text body
-      html: bodyHtml && bodyHtml, // html body
-      // html: 'Embedded image: <img src="cid:esing@logo"/><br/><img src="cid:symbol@logo"/>',
-      attachments: [{
-        filename: 'Esign.png',
-        path: __dirname + '/images/Esign.png',
-        cid: 'esing@logo' //same cid value as in the html img src
-      }, {
-        filename: 'symbol.png',
-        path: __dirname + '/images/symbol.png',
-        cid: 'symbol@logo' //same cid value as in the html img src
-      }],
-    }
+		let mailOptions = {
+			from: `"Esign"<${from}>`, // sender address
+			to, // list of receivers
+			subject, // Subject line
+			text: bodyText && bodyText, // plain text body
+			html: bodyHtml && bodyHtml, // html body
+			attachments: [{
+				filename: 'Esign.png',
+				path: __dirname + '/images/Esign.png',
+				cid: 'esing@logo' //same cid value as in the html img src
+			}, {
+				filename: 'symbol.png',
+				path: __dirname + '/images/symbol.png',
+				cid: 'symbol@logo' //same cid value as in the html img src
+			}],
+		}
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        reject({
-          status: false,
-          message: 'Mail can not sent.',
-          details: error,
-        })
-      } else {
-        resolve({
-          status: true,
-          message: 'Mail Sent.',
-          details: info.response,
-        })
-      }
-    });
-  });
+		transporter.sendMail(mailOptions, (error, info) => {
+			if (error) {
+				reject({
+					status: false,
+					message: 'Mail can not sent.',
+					details: error,
+				})
+			} else {
+				resolve({
+					status: true,
+					message: 'Mail Sent.',
+					details: info.response,
+				})
+			}
+		});
+	});
 }
 
 exports.setSignatureEMailBodyHtml = (sender, receiver, link) => {
-  return (`
+	return (`
   <div id=":12c" class="a3s aXjCH ">
 	<div style="background-color:#eaeaea;padding:2%;font-family:Helvetica,Arial,Sans Serif"><img style="display:none">
 		<table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" width="100%" dir="">
