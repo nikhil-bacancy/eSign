@@ -60,7 +60,6 @@ exports.addSignLogDetais = async (req, res) => {
   let counter = 0;
   await signLogCreateBulk(req).then((data) => {
     RecipientTokens.forEach((token, index) => {
-      console.log("TCL: exports.addSignLogDetais -> req.body", req.body)
       let from = req.body.sender.name;
       let to = req.body.recipientsList[index].email;
       let subject = "Testing Email From Nikhil Patel";

@@ -14,7 +14,7 @@
     position: absolute;
     height: inherit; 
     width: inherit;  
-    background-image: url(signature.png);
+    background: url(signature.png);
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;

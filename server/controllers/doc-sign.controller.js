@@ -204,7 +204,7 @@ exports.getDocSignDetails = (req, res) => {
           attributes: ['name'],
         }, {
           model: recipients,
-          attributes: ['name'],
+          attributes: ['name', 'email'],
         }],
     }).then(response => {
       return res.status(200).json({
