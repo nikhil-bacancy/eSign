@@ -107,3 +107,44 @@ exports.getSignLogsByDocSignId = (req, res) => {
     });
   });
 }
+
+const updateById = (req) => {
+  return new Promise((resolve, reject) => {
+    const sign_logs_details = [];
+    let counter = 0;
+    _.each(req.body.docSignLogs, (payload) => {
+      sign_logs.update(
+        { signId: payload.signId, statusId: (payload.signId) ? 2 : 1 },
+        { where: { id: payload.id, docSignId: payload.docSignId }, returning: true, pain: true }
+      ).then(([rowAffected, data]) => {
+        if (rowAffected) {
+          sign_logs_details.push(data[0]['dataValues']);
+          ++counter;
+          if (counter === req.body.docSignLogs.length) {
+            resolve(sign_logs_details);
+          }
+        } else {
+          reject("details mismatch / not found ");
+        }
+      }).catch((err) => {
+        reject(err.toString());
+      });
+    });
+  });
+}
+
+exports.update = async (req, res) => {
+  await updateById(req).then(data => {
+    return res.status(200).json({
+      status: true,
+      message: 'Document signed successfully.',
+      data: data,
+    });
+  }).catch((err) => {
+    return res.status(500).json({
+      status: false,
+      message: 'Internal Server Error.',
+      details: err.toString(),
+    });
+  });
+}

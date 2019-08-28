@@ -3,7 +3,7 @@ require('dotenv').config();
 
 exports.encrypt = (data) => {
   const privateKey = process.env.SECRET
-  let token = jwt.sign({ data }, privateKey, { expiresIn: '24h' }, { algorithm: 'RS256' });
+  let token = jwt.sign({ data }, privateKey, { expiresIn: '7d' }, { algorithm: 'RS256' });
   return token;
 }
 

@@ -20,3 +20,13 @@
     background-repeat: no-repeat;
     background-color: black;
 }
+
+.sign2 {
+    position: absolute;
+    height: inherit; 
+    width: inherit;  
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: white;
+}

@@ -21,11 +21,13 @@ const routes = (app) => {
         });
       } else {
         req.body.fileName = fileName;
-        req.body.filePath = uploadFilePath;
+        req.body.filePath = '/upload/signatures/';
         return signUploadControllers.uploadSign(req, res);
       }
     });
   });
+
+  app.get('/sign/:email', signUploadControllers.findSign)
 };
 
 module.exports = { routes };

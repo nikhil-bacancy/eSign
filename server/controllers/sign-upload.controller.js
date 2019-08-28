@@ -31,3 +31,22 @@ exports.uploadSign = async function (req, res) {
   }
 }
 
+exports.findSign = (req, res) => {
+  signs.findOne({
+    where: { email: req.params.email },
+    attributes: ['id', 'email', 'name', 'path'],
+  }).then(response => {
+    return res.status(200).json({
+      status: response ? true : false,
+      message: 'Sign Fetched Successfully..!',
+      data: response.dataValues,
+    })
+  }).catch(error => {
+    return res.status(500).json({
+      status: false,
+      message: 'No Sign Found.!',
+      error,
+    });
+  });
+
+}

@@ -116,7 +116,7 @@ class SignModal extends React.Component {
 											</div>
 											<div>
 												<Button color="warning" onClick={this.clear}>Clear</Button>{' '}
-												<Button color="primary" onClick={this.trim}>Save</Button>{' '}
+												<Button color="primary" onClick={this.trim}>Apply</Button>{' '}
 											</div>
 										</TabPane>
 										<TabPane tabId="2">
