@@ -32,7 +32,6 @@ class DoSign extends Component {
       signatureDetails: null,
       docId: null,
       recipientDetails: null,
-      creatorDetails: null,
       docSignId: null,
       signLogs: [],
       clientImageHeight: null,
@@ -59,19 +58,13 @@ class DoSign extends Component {
   }
 
   getDocSignDetails = (token) => {
-    let { docId, docSignId, documentDetails, recipientDetails, creatorDetails } = { ...this.state }
+    let { docId, docSignId, documentDetails, recipientDetails } = { ...this.state }
     return new Promise((resolve, reject) => {
       axios.get(`${baseUrl}/recipient/doc-sing?token=${token}`)
         .then((response) => {
           recipientDetails = {
             id: response.data.data.recipientId,
-            email: response.data.data.recipient.email,
-            name: response.data.data.recipient.name
-          }
-          creatorDetails = {
-            id: response.data.data.creatorId,
-            email: response.data.data.creator.email,
-            name: response.data.data.creator.name
+            email: response.data.data.recipient.email
           }
           docId = response.data.data.documentId;
           docSignId = response.data.data.id;
@@ -80,7 +73,7 @@ class DoSign extends Component {
             totalPages: response.data.data.document.totalPages,
             sender: response.data.data.creator.name
           }
-          resolve({ docId, docSignId, recipientDetails, documentDetails, creatorDetails });
+          resolve({ docId, docSignId, recipientDetails, documentDetails });
         })
         .catch(() => {
           toastError("Token Has Expired.!");
@@ -135,12 +128,11 @@ class DoSign extends Component {
   }
 
   onLoadPdf = () => {
-    let { imagePreviewUrl, docId, docSignId, documentDetails, signLogs, isLoading, recipientDetails, signatureDetails, isSignSet, creatorDetails } = { ...this.state }
+    let { imagePreviewUrl, docId, docSignId, documentDetails, signLogs, isLoading, recipientDetails, signatureDetails, isSignSet } = { ...this.state }
     const token = queryString.parse(this.props.location.search).token;
     this.getDocSignDetails(token).then(docSignData => {
       docId = docSignData.docId;
       recipientDetails = docSignData.recipientDetails;
-      creatorDetails = docSignData.creatorDetails;
       docSignId = docSignData.docSignId;
       documentDetails = docSignData.documentDetails;
       this.getDocDetails(docId).then(docData => {
@@ -151,9 +143,9 @@ class DoSign extends Component {
             signatureDetails = signatureData;
             recipientDetails.signImg = `${baseUrl}/upload/signatures/${signatureData.name}`;
             isSignSet = true;
-            this.setState({ isSignSet, signatureDetails, imagePreviewUrl, docId, creatorDetails, recipientDetails, documentDetails, docSignId, signLogs, isLoading: !isLoading })
+            this.setState({ isSignSet, signatureDetails, imagePreviewUrl, docId, recipientDetails, documentDetails, docSignId, signLogs, isLoading: !isLoading })
           }).catch(err => {
-            this.setState({ imagePreviewUrl, docId, recipientDetails, creatorDetails, documentDetails, docSignId, signLogs, isLoading: !isLoading })
+            this.setState({ imagePreviewUrl, docId, recipientDetails, documentDetails, docSignId, signLogs, isLoading: !isLoading })
           });
         });
       })
@@ -294,9 +286,9 @@ class DoSign extends Component {
   }
 
   onFinalSignatureClick = () => {
-    const { signLogs, docId, docSignId, recipientDetails, creatorDetails } = this.state;
+    const { signLogs } = this.state;
     if (signLogs.length > 0) {
-      axios.put(`${baseUrl}/signlogs/`, { docSignLogs: signLogs, docId, docSignId, recipientDetails, creatorDetails })
+      axios.put(`${baseUrl}/signlogs/`, { docSignLogs: signLogs })
         .then((response) => {
           toastSuccess(response.data.message);
         })
@@ -310,7 +302,6 @@ class DoSign extends Component {
     const { imagePreviewUrl, documentDetails, signLogs, aboutPage, isLoading, isSignSet, recipientDetails, signatureUrl, signCounter } = this.state;
     return (
       <>
-        <SignModal toggle={this.toggle} open={this.state.open} signatureUrl={signatureUrl} onUploadSign={this.onUploadSign} />
         <Form className='mx-5' id='setsignForm'>
           {documentDetails !== null &&
             <>
@@ -318,22 +309,17 @@ class DoSign extends Component {
                 <Col md={12} color="primary">
                   <div style={{ height: "60px" }} className="d-flex flex-row align-items-center">
                     <div className="mr-3">
-                      <Label size="sm" className='align text-white text-uppercase m-0'>- Select Signature For The Document :</Label>
+                      <Label size="sm" className='align text-white text-uppercase m-0'>- Document Signature Status:</Label>
                     </div>
                     <div className="mr-3">
-                      <div className="bg-white"><img src={recipientDetails.signImg ? recipientDetails.signImg : signImg} width={recipientDetails.signImg ? "140px" : "55px"} height="45px" alt="not found" /></div>
+
                     </div>
                     <div className="mr-3">
-                      {
-                        isSignSet ?
-                          <Button color="warning" onClick={this.toggle}>Edit</Button>
-                          :
-                          <Button color="primary" onClick={this.toggle}>Select Signature</Button>
-                      }
+                      <Button color="primary" onClick={this.toggle}>Select Signature</Button>
                     </div>
                     <div className="mr-3">
                       {
-                        <Button color="success" id="btnFinalDocSignature" disabled={(signCounter === signLogs.length) ? false : true} onClick={this.onFinalSignatureClick}>Finish Signature</Button>
+                        <Button color="success" id="btnFinalDocSignature" onClick={this.onFinalSignatureClick}>Finish Signature</Button>
                       }
                     </div>
                   </div>
@@ -341,7 +327,7 @@ class DoSign extends Component {
               </Row>
               < Row form>
                 <Col md={4}>
-                  <center><Label size="lg" className='align text-primary text-uppercase'><Label className="text-secondary">-  Sender :</Label> {documentDetails.sender} </Label></center>
+                  <center><Label size="lg" className='align text-primary text-uppercase'><Label className="text-secondary">-  Recipient :</Label> {documentDetails.sender} </Label></center>
                 </Col>
                 <Col md={4}>
                   <center><Label size="lg" className='align text-primary text-uppercase'><Label className="text-secondary">-  Doc Name -</Label> <br />{documentDetails.name} </Label></center>
@@ -369,7 +355,6 @@ class DoSign extends Component {
                 </>
                 :
                 <center><p className="text-white text-uppercase mt-5">No Document Found..!</p></center>
-
               }
             </div>
           </Row>
@@ -380,75 +365,3 @@ class DoSign extends Component {
 }
 
 export default withRouter(DoSign);
-
-
-
-
-// onLoadPdf = () => {
-//   let { imagePreviewUrl, docId, docSignId, documentDetails, signLogs, isLoading } = { ...this.state }
-//   const token = queryString.parse(this.props.location.search).token;
-//   axios.get(`${baseUrl}/recipient/doc-sing?token=${token}`)
-//     .then((response) => {
-//       docId = response.data.data.documentId;
-//       docSignId = response.data.data.id;
-//       documentDetails = {
-//         name: response.data.data.document.name,
-//         totalPages: response.data.data.document.totalPages,
-//         sender: response.data.data.creator.name
-//       }
-//       axios.get(`${baseUrl}/getDoc/${docId}`)
-//         .then((response) => {
-//           if (response.data.data) {
-//             imagePreviewUrl = response.data.data
-//             axios.get(`${baseUrl}/sign-logs/${docSignId}`)
-//               .then((response) => {
-//                 if (response.data.data) {
-//                   signLogs = response.data.data
-//                   this.setState({ imagePreviewUrl, docId, documentDetails, docSignId, signLogs, isLoading: !isLoading })
-//                 }
-//               })
-//               .catch((error) => {
-//                 console.log('sign-logs data fetch error :', error);
-//               });
-//           }
-//         })
-//         .catch((error) => {
-//           console.log(error);
-//         });
-//     })
-//     .catch(() => {
-//       toastError("Token Has Expired.!");
-//     });
-// }
-
-// onSendFile = () => {
-//   const payload = {
-//     pageNo: this.state.pageNumber - 1,
-//     totalPages: this.state.numPages,
-//     signX: this.state.signPos[0],
-//     signY: this.state.signPos[1],
-//     divX: this.state.divPos[0],
-//     divY: this.state.divPos[1],
-//     pdf: this.state.file,
-//     sign: this.state.file2,
-//   }
-//   axios.post('http://192.168.1.49:8000/pdftohtml/', this.formdataCoverter(payload))
-//     .then(function (response) {
-//       console.log(response);
-//     })
-//     .catch(function (error) {
-//       console.log(error);
-//     });
-// }
-
-/* <div style={{
-  background: ` ${(recipientDetails.signImg === undefined) ? `url(${recipientDetails.signImg})` : `url(${signImg})`} `,
-  backgroundSize: "containt",
-  backgroundPosition: "center",
-  backgroundRepeat: "no-repeat",
-}}> */
-
-
-// document.getElementById("id01").childNodes
-//document.getElementById("s115").scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
-// document.getElementById(signLogId).nextSibling.id

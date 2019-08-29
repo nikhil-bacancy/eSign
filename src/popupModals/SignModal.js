@@ -2,7 +2,7 @@ import React from 'react';
 import {
 	TabContent, TabPane,
 	Nav, NavItem, NavLink,
-	Button, Form, FormGroup, Row, Col, Label, Input,
+	Button, Form, FormGroup, Row, Col, Label,
 	Modal, ModalBody, ModalFooter, ModalHeader
 } from 'reactstrap';
 import SignatureCanvas from 'react-signature-canvas';
@@ -69,7 +69,7 @@ class SignModal extends React.Component {
 					<ModalHeader toggle={this.props.toggle}	>Signature Selection</ModalHeader>
 					<ModalBody style={{ backgroundColor: "whitesmoke" }}>
 						<Form>
-							<Row>
+							{/* <Row>
 								<Col md={6}>
 									<FormGroup>
 										<Label for="exampleFullname">Full Name</Label>
@@ -82,7 +82,7 @@ class SignModal extends React.Component {
 										<Input type="text" name="initial" id="exampleInitial" placeholder="Initial As Per Fullname" />
 									</FormGroup>
 								</Col>
-							</Row>
+							</Row> */}
 							<Row>
 								<Col md={12} >
 									<Nav tabs>

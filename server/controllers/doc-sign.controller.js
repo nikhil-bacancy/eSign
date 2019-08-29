@@ -78,33 +78,57 @@ exports.create = (req, res) => {
   });
 }
 
-// exports.update = async (req, res) => {
-//   const docSignId = req.params.id;
-//   await doc_signs.update(
-//     { pageRatio: req.body.pageRatio },
-//     { where: { id: docSignId }, returning: true, pain: true }
-//   ).then(([rowAffected, data]) => {
-//     if (rowAffected) {
-//       return res.status(200).json({
-//         status: true,
-//         message: 'doc sign details updated successfully.',
-//         data: data,
-//       });
-//     } else {
-//       return res.status(500).json({
-//         status: false,
-//         message: 'update Unsuccessful / check Id.',
-//         data: data,
-//       });
-//     }
-//   }).catch((err) => {
-//     return res.status(500).json({
-//       status: false,
-//       message: 'details not found.',
-//       details: err.toString(),
-//     });
-//   });
-// }
+exports.updateById = (req) => {
+  const docSignId = req.body.docSignId || req.body.id;
+  return new Promise((resolve, reject) => {
+    doc_signs.update(
+      { statusId: req.body.statusId, },
+      { where: { id: docSignId }, returning: true, pain: true }
+    ).then(([rowAffected, data]) => {
+      if (rowAffected) {
+        resolve({
+          status: true,
+          message: 'doc sign details updated successfully.',
+          data: data[0]['dataValues'],
+        });
+      } else {
+        console.log("TCL: exports.updateById -> reject")
+        reject({
+          status: false,
+          message: 'update Unsuccessful / check Id.',
+          data: data,
+        });
+      }
+    }).catch((err) => {
+      reject({
+        status: false,
+        message: 'details not found.',
+        details: err.toString(),
+      });
+    });
+  });
+}
+
+exports.sendMailOnDocSignComplete = (docId) => {
+  return new Promise((resolve, reject) => {
+    doc_signs.findAll({
+      where: { documentId: docId },
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+    }).map(el => el.get({ plain: true })).then((response) => {
+      resolve({
+        status: response.length ? true : false,
+        message: response.length ? 'Doc Sign Logs Data Found..!' : 'Doc Sign Logs Data Not Found..!',
+        data: response,
+      });
+    }).catch(error => {
+      reject({
+        status: false,
+        message: 'docsign mail Internal server error',
+        error: error.original,
+      });
+    });
+  });
+}
 
 exports.getPdfImageUrls = async (req, res) => {
   let docData;
@@ -201,7 +225,7 @@ exports.getDocSignDetails = (req, res) => {
           attributes: ['name', 'path', 'docType', 'totalPages'],
         }, {
           model: creators,
-          attributes: ['name'],
+          attributes: ['name', 'email'],
         }, {
           model: recipients,
           attributes: ['name', 'email'],

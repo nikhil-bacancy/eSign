@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-exports.sendEMail = (from, to, subject, bodyText, bodyHtml) => {
+exports.sendEMail = (from, to, subject, bodyText, bodyHtml, attachments) => {
 	return new Promise((resolve, reject) => {
 		let transporter = nodemailer.createTransport({
 			// service: "Gmail",
@@ -19,15 +19,16 @@ exports.sendEMail = (from, to, subject, bodyText, bodyHtml) => {
 			subject, // Subject line
 			text: bodyText && bodyText, // plain text body
 			html: bodyHtml && bodyHtml, // html body
-			attachments: [{
-				filename: 'Esign.png',
-				path: __dirname + '/images/Esign.png',
-				cid: 'esing@logo' //same cid value as in the html img src
-			}, {
-				filename: 'symbol.png',
-				path: __dirname + '/images/symbol.png',
-				cid: 'symbol@logo' //same cid value as in the html img src
-			}],
+			attachments,
+			// attachments: [{
+			// 	filename: 'Esign.png',
+			// 	path: __dirname + '/images/Esign.png',
+			// 	cid: 'esing@logo' //same cid value as in the html img src
+			// }, {
+			// 	filename: 'symbol.png',
+			// 	path: __dirname + '/images/symbol.png',
+			// 	cid: 'symbol@logo' //same cid value as in the html img src
+			// }],
 		}
 
 		transporter.sendMail(mailOptions, (error, info) => {
