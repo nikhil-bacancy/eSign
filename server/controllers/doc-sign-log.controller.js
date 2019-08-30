@@ -4,7 +4,7 @@ const path = require('path');
 const middleware = require('../helper/middleware');
 const emailer = require('../helper/emailer');
 const doc_sign_Func = require('./doc-sign.controller')
-
+const uploadFilePath = path.normalize(__dirname + '/../helper/images/');
 const sign_logs = db.sign_logs;
 
 let pageConfig = {
@@ -59,14 +59,13 @@ const signLogCreateBulk = (req) => {
 exports.addSignLogDetais = async (req, res) => {
   let RecipientTokens = req.body.recipientsList.map(({ email, docSignId }) => middleware.encrypt({ email, docSignId }))
   let counter = 0;
-  const uploadFilePath = path.normalize(__dirname + '/../helper/images/');
   await signLogCreateBulk(req).then((data) => {
     RecipientTokens.forEach((token, index) => {
       let from = req.body.sender.name;
       let to = req.body.recipientsList[index].email;
       let subject = "Testing Email From Nikhil Patel";
       let link = `${process.env.APP_LINK}/recipient/sign?token=${token} `
-      let html = emailer.setSignatureEMailBodyHtml(req.body.sender, req.body.recipientsList[index], link)
+      let html = emailer.setSignatureEMailBodyHtml(req.body.sender, req.body.recipientsList[index], link, 'setSign')
       let attachments = [{
         filename: 'Esign.png',
         path: uploadFilePath + 'Esign.png',
@@ -144,71 +143,93 @@ const updateById = (req) => {
   });
 }
 
-notifySenderByMail = (req, totalRecipients, completedSignCounts) => {
+notifySenderByMail = (req, totalRecipients, completedSignCounts, tokenToSender) => {
   return new Promise((resolve, reject) => {
-    let from = req.body.recipientDetails.name;
-    let to = req.body.creatorDetails.email;
-    let subject = "Testing Email From Nikhil Patel";
-    let html;
-    if (totalRecipients === completedSignCounts) {
-      html = `<p>Finally Doc Has Been Signed.!</p>`;
-    } else {
-      html = `<p>Recipient : <b> ${req.body.recipientDetails.name} </b> Has Signed The Document.!</p><p>Recipient Email Id : <a href="mailto:${req.body.recipientDetails.email}" target="_blank">${req.body.recipientDetails.email}</a> </p>`;
-    }
-    let attachments = null;
-    emailer.sendEMail(from, to, subject, null, html, attachments).then(respose => {
-      resolve(respose);
-    }).catch(error => {
+    try {
+      let from = req.body.recipientDetails.name;
+      let to = req.body.creatorDetails.email;
+      let subject = "Testing Email From Nikhil Patel";
+      let html;
+      let attachments;
+      if (totalRecipients === completedSignCounts) {
+        let link = `${process.env.APP_LINK}/sender/viewsign?token=${tokenToSender} `
+        html = emailer.setSignatureEMailBodyHtml(req.body.creatorDetails, req.body.recipientDetails, link, 'dosign');
+        attachments = [{
+          filename: 'Esign.png',
+          path: uploadFilePath + 'Esign.png',
+          cid: 'esing@logo' //same cid value as in the html img src
+        }, {
+          filename: 'symbol.png',
+          path: uploadFilePath + 'symbol.png',
+          cid: 'symbol@logo' //same cid value as in the html img src
+        }]
+      } else {
+        html = `<p>Recipient : <b> ${req.body.recipientDetails.name} </b> Has Signed The Document.!</p><p>Recipient Email Id : <a href="mailto:${req.body.recipientDetails.email}" target="_blank">${req.body.recipientDetails.email}</a> </p>`;
+        attachments = null;
+      }
+      null;
+      emailer.sendEMail(from, to, subject, null, html, attachments).then(respose => {
+        resolve(respose);
+      }).catch(error => {
+        reject({ error });
+      })
+    } catch (error) {
+      console.log("TCL: notifySenderByMail -> error", error);
       reject({ error });
-    })
+    }
   });
 }
 
 exports.update = async (req, res) => {
-  await updateById(req).then(sign_log_data => {
-    req.body.statusId = 2;
-    doc_sign_Func.updateById(req)
-      .then(() => {
-        doc_sign_Func.sendMailOnDocSignComplete(req.body.docId)
-          .then(doc_sign_res => {
-            let totalRecipients = doc_sign_res.data.length;
-            let completedSignCounts = 0;
-            doc_sign_res.data.forEach(doc_sign_Obj => {
-              if (doc_sign_Obj.statusId === 2) {
-                ++completedSignCounts;
-              }
-            });
-            notifySenderByMail(req, totalRecipients, completedSignCounts).then(respose => {
-              return res.status(200).json({
-                status: true,
-                message: 'Document signed successfully.',
-                data: sign_log_data,
-                respose
+  try {
+    let tokenToSender = middleware.encrypt({ docId: req.body.docId })
+    await updateById(req).then(sign_log_data => {
+      req.body.statusId = 2;
+      doc_sign_Func.updateById(req)
+        .then(() => {
+          doc_sign_Func.onDocSignComplete(req.body.docId)
+            .then(doc_sign_res => {
+              let totalRecipients = doc_sign_res.data.length;
+              let completedSignCounts = 0;
+              doc_sign_res.data.forEach(doc_sign_Obj => {
+                if (doc_sign_Obj.statusId === 2) {
+                  ++completedSignCounts;
+                }
               });
-            }).catch(error => {
-              return res.status(500).json({ error });
+              notifySenderByMail(req, totalRecipients, completedSignCounts, tokenToSender).then(respose => {
+                return res.status(200).json({
+                  status: true,
+                  message: 'Document signed successfully.',
+                  data: sign_log_data,
+                  respose
+                });
+              }).catch(error => {
+                return res.status(500).json({ error });
+              });
+            }).catch((err) => {
+              return res.status(500).json({
+                status: false,
+                message: 'doc_sign mail Internal Server Error.',
+                details: err
+              });
             });
-          }).catch((err) => {
-            return res.status(500).json({
-              status: false,
-              message: 'doc_sign mail Internal Server Error.',
-              details: err
-            });
+        }).catch((err) => {
+          return res.status(500).json({
+            status: false,
+            message: 'doc_sign Internal Server Error.',
+            details: err
           });
-      }).catch((err) => {
-        return res.status(500).json({
-          status: false,
-          message: 'doc_sign Internal Server Error.',
-          details: err
         });
+    }).catch((err) => {
+      return res.status(500).json({
+        status: false,
+        message: 'sign_log Internal Server Error.',
+        details: err
       });
-  }).catch((err) => {
-    return res.status(500).json({
-      status: false,
-      message: 'sign_log Internal Server Error.',
-      details: err
     });
-  });
+  } catch (error) {
+    console.log("TCL: exports.update -> error", error)
+  }
 }
 
 

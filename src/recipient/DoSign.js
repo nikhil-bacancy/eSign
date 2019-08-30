@@ -61,7 +61,7 @@ class DoSign extends Component {
   getDocSignDetails = (token) => {
     let { docId, docSignId, documentDetails, recipientDetails, creatorDetails } = { ...this.state }
     return new Promise((resolve, reject) => {
-      axios.get(`${baseUrl}/recipient/doc-sing?token=${token}`)
+      axios.get(`${baseUrl}/recipient/doc-sign?token=${token}`)
         .then((response) => {
           recipientDetails = {
             id: response.data.data.recipientId,

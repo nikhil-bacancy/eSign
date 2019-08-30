@@ -109,7 +109,7 @@ exports.updateById = (req) => {
   });
 }
 
-exports.sendMailOnDocSignComplete = (docId) => {
+exports.onDocSignComplete = (docId) => {
   return new Promise((resolve, reject) => {
     doc_signs.findAll({
       where: { documentId: docId },
@@ -216,6 +216,7 @@ exports.sendDoc = function (req, res) {
 exports.getDocSignDetails = (req, res) => {
   middleware.decrypt(req.query.token).then(tokenData => {
     const data = JSON.parse(JSON.stringify(tokenData));
+    console.log("TCL: exports.getDocSignDetails -> data", data)
     doc_signs.find({
       where: { id: data.docSignId },
       attributes: ['id', 'documentId', 'creatorId', 'recipientId'],
@@ -231,6 +232,7 @@ exports.getDocSignDetails = (req, res) => {
           attributes: ['name', 'email'],
         }],
     }).then(response => {
+      console.log("TCL: exports.getDocSignDetails -> response", response)
       return res.status(200).json({
         status: response ? true : false,
         message: 'Doc Sign Data Fetched Successfully..!',
@@ -241,6 +243,47 @@ exports.getDocSignDetails = (req, res) => {
         status: false,
         message: 'Internal server error',
         error,
+      });
+    });
+  }).catch(error => {
+    return res.status(500).json({
+      status: false,
+      message: 'Token Has Expired.!',
+      error,
+    });
+  });
+}
+
+exports.getDocSignDetailsByDocId = (req, res) => {
+  middleware.decrypt(req.query.token).then(tokenData => {
+    const data = JSON.parse(JSON.stringify(tokenData));
+    doc_signs.findAll({
+      where: {
+        documentId: data.docId
+      },
+      attributes: ['id', 'documentId', 'creatorId', 'statusId'],
+      include: [
+        {
+          model: documents,
+          attributes: ['id', 'name', 'path', 'docType', 'totalPages'],
+        }, {
+          model: creators,
+          attributes: ['id', 'name', 'email'],
+        }, {
+          model: recipients,
+          attributes: ['id', 'name', 'email'],
+        }],
+    }).map(el => el.get({ plain: true })).then(response => {
+      return res.status(200).json({
+        status: response.length ? true : false,
+        message: response.length ? 'Doc Sign Data Fetched Successfully..!' : 'Doc Sign Data Not Found..!',
+        data: response,
+      });
+    }).catch(error => {
+      return res.status(500).json({
+        status: false,
+        message: 'Internal server error',
+        error: error.original,
       });
     });
   }).catch(error => {
