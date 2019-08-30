@@ -216,7 +216,6 @@ exports.sendDoc = function (req, res) {
 exports.getDocSignDetails = (req, res) => {
   middleware.decrypt(req.query.token).then(tokenData => {
     const data = JSON.parse(JSON.stringify(tokenData));
-    console.log("TCL: exports.getDocSignDetails -> data", data)
     doc_signs.find({
       where: { id: data.docSignId },
       attributes: ['id', 'documentId', 'creatorId', 'recipientId'],
@@ -232,7 +231,6 @@ exports.getDocSignDetails = (req, res) => {
           attributes: ['name', 'email'],
         }],
     }).then(response => {
-      console.log("TCL: exports.getDocSignDetails -> response", response)
       return res.status(200).json({
         status: response ? true : false,
         message: 'Doc Sign Data Fetched Successfully..!',

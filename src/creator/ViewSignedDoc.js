@@ -5,7 +5,6 @@ import './recipient.css';
 import queryString from "query-string";
 import { withRouter } from 'react-router-dom';
 import { toastError } from "../NotificationToast";
-const signImg = require('./signature.png');
 
 
 const baseUrl = process.env.REACT_APP_API_URL;

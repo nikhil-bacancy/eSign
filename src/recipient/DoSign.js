@@ -6,6 +6,7 @@ import queryString from "query-string";
 import { withRouter } from 'react-router-dom';
 import { toastError, toastSuccess } from "../NotificationToast";
 import SignModal from "../popupModals/SignModal";
+import SortArrayWithMultiVal from "../utils/SortArrayWithMultiVal";
 const signImg = require('./signature.png');
 
 
@@ -106,13 +107,17 @@ class DoSign extends Component {
   }
 
   getSignLogs = (docSignId) => {
-    let { signLogs } = { ...this.state }
+    let { signLogs, signCounter } = { ...this.state }
     return new Promise((resolve, reject) => {
       axios.get(`${baseUrl}/sign-logs/${docSignId}`)
         .then((response) => {
           if (response.data.data) {
             signLogs = response.data.data
-            resolve({ signLogs })
+            signLogs.forEach((objSign, index) => {
+              signCounter += objSign.signId ? 1 : 0;
+              signLogs[index]['tempCoordY'] = parseFloat(signLogs[index]['signCoord'].split(',')[1]);
+            });
+            resolve({ signLogs, signCounter })
           }
         })
         .catch((error) => {
@@ -135,7 +140,9 @@ class DoSign extends Component {
   }
 
   onLoadPdf = () => {
-    let { imagePreviewUrl, docId, docSignId, documentDetails, signLogs, isLoading, recipientDetails, signatureDetails, isSignSet, creatorDetails } = { ...this.state }
+    // this.testingSort();
+    //document.getElementById(nextSibling.id).scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" })
+    let { signCounter, imagePreviewUrl, docId, docSignId, documentDetails, signLogs, isLoading, recipientDetails, signatureDetails, isSignSet, creatorDetails } = { ...this.state }
     const token = queryString.parse(this.props.location.search).token;
     this.getDocSignDetails(token).then(docSignData => {
       docId = docSignData.docId;
@@ -147,13 +154,26 @@ class DoSign extends Component {
         imagePreviewUrl = docData.imagePreviewUrl;
         this.getSignLogs(docSignId).then(signLogsData => {
           signLogs = signLogsData.signLogs;
+          signCounter = signLogsData.signCounter;
+          signLogs = signLogs.sort(SortArrayWithMultiVal("pageNo", "tempCoordY"))
           this.getSignature(recipientDetails.email).then(signatureData => {
             signatureDetails = signatureData;
             recipientDetails.signImg = `${baseUrl}/upload/signatures/${signatureData.name}`;
             isSignSet = true;
-            this.setState({ isSignSet, signatureDetails, imagePreviewUrl, docId, creatorDetails, recipientDetails, documentDetails, docSignId, signLogs, isLoading: !isLoading })
+            this.setState({
+              signCounter, isSignSet, signatureDetails,
+              imagePreviewUrl, docId, creatorDetails, recipientDetails,
+              documentDetails, docSignId, signLogs, isLoading: !isLoading
+            })
+            setTimeout(() => {
+              document.getElementById(signLogs[0].id).scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" })
+            }, 2000);
           }).catch(err => {
-            this.setState({ imagePreviewUrl, docId, recipientDetails, creatorDetails, documentDetails, docSignId, signLogs, isLoading: !isLoading })
+            this.setState({
+              signCounter, imagePreviewUrl, docId,
+              recipientDetails, creatorDetails, documentDetails,
+              docSignId, signLogs, isLoading: !isLoading
+            })
           });
         });
       })
@@ -217,10 +237,24 @@ class DoSign extends Component {
     }
   }
 
+  // testingSort = () => {
+  //   var signLogs = [
+  //     { pageNo: 1, signCoord: "565.6666666666666", id: 114 },
+  //     { pageNo: 2, signCoord: "59.985714285714266", id: 115 },
+  //     { pageNo: 1, signCoord: "228.95714285714286", id: 116 },
+  //     { pageNo: 2, signCoord: "99.7222222222222", id: 117 },
+  //   ];
+  // console.log("TCL: testingSort -> signLogs.sort(SortArrayWithMultiVal('PageNo'))", signLogs.sort(SortArrayWithMultiVal("pageNo", "signCoord")))
+  // }
+
   onSetSign = (event) => {
     let { recipientDetails, signLogs, signatureDetails, signCounter } = { ...this.state };
     let signLogId = parseInt(event.target.id.substring(1));
     if (recipientDetails.signImg) {
+      if (signCounter === signLogs.length) {
+        toastSuccess('All Signs Complete.!');
+        return '';
+      }
       signLogs = this.state.signLogs.map((obj) => {
         if (obj.id === signLogId) {
           if (obj.signId) {
@@ -333,7 +367,7 @@ class DoSign extends Component {
                     </div>
                     <div className="mr-3">
                       {
-                        <Button color="success" id="btnFinalDocSignature" disabled={(signCounter === signLogs.length) ? false : true} onClick={this.onFinalSignatureClick}>Finish Signature</Button>
+                        <Button color="success" id="btnFinalDocSignature" disabled={(signCounter === signLogs.length) ? true : false} onClick={this.onFinalSignatureClick}>Finish Signature</Button>
                       }
                     </div>
                   </div>
