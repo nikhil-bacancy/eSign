@@ -8,6 +8,7 @@
 .env
 config/
 /server/upload
+/server/results
 
 # testing
 /coverage

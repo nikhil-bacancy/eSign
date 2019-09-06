@@ -7,17 +7,6 @@ const doc_sign_Func = require('./doc-sign.controller')
 const uploadFilePath = path.normalize(__dirname + '/../helper/images/');
 const sign_logs = db.sign_logs;
 
-let pageConfig = {
-  PAGE_NUM: 0,
-  TOTAL_PAGES: 2,
-  SIGN_POSX: 452,
-  SIGN_POSY: 380,
-  DIV_POSX: '',
-  DIV_POSY: '',
-  SIGN_PNG: '',
-  PDF_DOC: ''
-};
-
 const signLogCreateBulk = (req) => {
   return new Promise((resolve, reject) => {
     const sign_logs_details = [];

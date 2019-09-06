@@ -22,7 +22,7 @@
     "node-pg-migrate": "^3.21.1",
     "nodemailer": "^6.0.0",
     "pdf-image": "^2.0.0",
-    "pdf-lib": "^0.6.4",
+    "pdf-lib": "^1.0.1",
     "pg": "^7.12.0",
     "pg-hstore": "^2.3.3",
     "sequelize": "^4.44.2",

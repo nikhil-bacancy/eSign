@@ -1,44 +1,53 @@
 const fs = require('fs');
-const { PDFDocumentFactory, PDFDocumentWriter, drawImage } = require('pdf-lib');
+const { PDFDocument, PDFDocumentWriter, drawImage } = require('pdf-lib');
+const path = require('path');
+const resultDir = path.normalize(__dirname + '/../results/');
 
-exports.modifyPDF = function (pageConfig) {
+exports.modifyPDF = async function (pageConfig, PDF_DOC) {
+    try {
 
-    const assets = {
-        signPngBytes: pageConfig.SIGN_PNG.buffer, // fs.readFileSync(pageConfig.SIGN_PNG), 
-        pdfDocBytes: pageConfig.PDF_DOC.buffer //fs.readFileSync(pageConfig.PDF_DOC),
-    };
 
-    const pdfDoc = PDFDocumentFactory.load(assets.pdfDocBytes);
-    const [marioPngRef, marioPngDims] = pdfDoc.embedPNG(assets.signPngBytes);
+        let filePathArray = PDF_DOC.split('/');
+        const fileName = filePathArray[filePathArray.length - 1];
+        const filePath = `${resultDir}` + fileName;
 
-    const PNG = 'MarioPng';
-    const PNG_WIDTH = marioPngDims.width * 0.15;
-    const PNG_HEIGHT = marioPngDims.height * 0.10;
+        const assets = {
+            signPngBytes: fs.readFileSync(pageConfig[0].SIGN_PNG),
+            pdfDocBytes: fs.readFileSync(PDF_DOC),
+        };
 
-    const pages = pdfDoc.getPages();
+        const pdfDoc = await PDFDocument.load(assets.pdfDocBytes);
+        const marioPngRef = await pdfDoc.embedPng(assets.signPngBytes);
 
-    const existingPage = pages[pageConfig.PAGE_NUM].addImageObject(PNG, marioPngRef);
+        const pages = pdfDoc.getPages()
+        const { width, height } = pages[0].getSize();
+        const PNG_WIDTH = (width / 9);
+        const PNG_HEIGHT = (height / 35);
 
-    const newContentStream = pdfDoc.createContentStream(
-        drawImage(PNG, {
-            x: 452, //pageConfig.SIGN_POSX,
-            y: 380 * pageConfig.TOTAL_PAGES, //pageConfig.SIGN_POSY * pageConfig.TOTAL_PAGES,
-            width: PNG_WIDTH,
-            height: PNG_HEIGHT,
-        }),
-    );
+        pageConfig.forEach((pageObj) => {
+            console.log("TCL: pageObj", pageObj)
+            let coord_x = (pageObj.PAGE_RATIO_X * width);
+            let coord_y = (pageObj.PAGE_RATIO_Y * height);
+            pages[pageObj.PAGE_NUM - 1].drawImage(marioPngRef, {
+                x: coord_x,
+                y: (height - (coord_y + 23)),
+                width: PNG_WIDTH,
+                height: PNG_HEIGHT,
+            })
+        });
 
-    existingPage.addContentStreams(pdfDoc.register(newContentStream));
 
-    const pdfBytes = PDFDocumentWriter.saveToBytes(pdfDoc);
+        if (!fs.existsSync(resultDir)) {
+            fs.mkdirSync(resultDir);
+        }
 
-    var resultDir = `${__dirname}/results`;
+        const pdfBytes = await pdfDoc.save();
+        fs.writeFileSync(filePath, pdfBytes);
 
-    if (!fs.existsSync(resultDir)) {
-        fs.mkdirSync(resultDir);
+        console.log(`PDF file written to: ${filePath}`);
+        return fileName;
+    } catch (error) {
+        console.log("TCL: error", error)
+        return error;
     }
-    const filePath = `${__dirname}/results/modified.pdf`;
-    fs.writeFileSync(filePath, pdfBytes);
-    console.log(`PDF file written to: ${filePath}`);
-    return `PDF file written to: ${filePath}`;
 }

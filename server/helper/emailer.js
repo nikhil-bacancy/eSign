@@ -79,7 +79,7 @@ exports.setSignatureEMailBodyHtml = (sender, receiver, link, task) => {
 																<tr>
 																	<td
 																		style="padding-top:24px;font-size:16px;font-family:Helvetica,Arial,Sans Serif;border:none;text-align:center;color:#ffffff"
-																		align="center"> ${ (task === 'setSign') ? sender.name + 'sent you a document to review and sign.' : 'Entire document has been signed and ready to review. '}  </td>
+																		align="center"> ${ (task === 'setSign') ? sender.name + ' ' + 'sent you a document to review and sign.' : 'Entire document has been signed and ready to review. '}  </td>
 																</tr >
 															</tbody >
 														</table >
@@ -135,7 +135,7 @@ exports.setSignatureEMailBodyHtml = (sender, receiver, link, task) => {
 			:
 			''
 		}
-				<span style="font-family:monospace;font-size:14px;color:#333333;font-size: large;line-height:20px">${(receiver.label) ? receiver.label + '<br/><br/>, ' : ''}Please <span class="il">Sign/Review</span>
+				<span style="font-family:monospace;font-size:14px;color:#333333;font-size: large;line-height:20px">${(receiver.label) ? receiver.label + ',<br/><br/> ' : ''}Please <span class="il">Sign/Review</span>
 						The Document That Is Shared Through Esign.<br><br> Thank You, ${sender.name}
                     </span><br>
                   </td>

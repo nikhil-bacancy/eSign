@@ -13,6 +13,7 @@
     "react-dnd-touch-backend": "^9.3.4",
     "react-dom": "^16.8.6",
     "react-draggable": "^3.3.0",
+    "react-dropzone": "^10.1.8",
     "react-html-parser": "^2.0.2",
     "react-pdf": "^4.1.0",
     "react-router-dom": "^5.0.1",

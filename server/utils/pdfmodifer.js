@@ -17,8 +17,8 @@ const [marioPngRef, marioPngDims] = pdfDoc.embedPNG(assets.marioPngBytes);
 // Let's define constant that can be used as reference later.
 
 const PNG = 'MarioPng';
-const PNG_WIDTH = marioPngDims.width * 0.15;
-const PNG_HEIGHT = marioPngDims.height * 0.10;
+const PNG_WIDTH = 100; //marioPngDims.width * 0.15;
+const PNG_HEIGHT = 30;//marioPngDims.height * 0.10;
 const pageNum = 1 || pageConfig.PAGE_NUM;
 const totalPage = 2 || pageConfig.TOTAL_PAGES;
 const posX = 50 || pageConfig.SIGN_POSX;
@@ -41,6 +41,12 @@ const newContentStream = pdfDoc.createContentStream(
   drawImage(PNG, {
     x: posX,
     y: posY,
+    width: PNG_WIDTH,
+    height: PNG_HEIGHT,
+  }),
+  drawImage(PNG, {
+    x: 150,
+    y: 300,
     width: PNG_WIDTH,
     height: PNG_HEIGHT,
   }),

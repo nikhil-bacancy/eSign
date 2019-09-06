@@ -4,7 +4,7 @@ import { Form, Label, Col, Row, Button } from 'reactstrap';
 import './recipient.css';
 import queryString from "query-string";
 import { withRouter } from 'react-router-dom';
-import { toastError } from "../NotificationToast";
+import { toastError, toastSuccess } from "../NotificationToast";
 
 
 const baseUrl = process.env.REACT_APP_API_URL;
@@ -212,7 +212,6 @@ class ViewSignedDoc extends Component {
 
   renderSignOnPosition = () => {
     let { aboutPage, pageDetails, signatureDetails } = { ...this.state }
-    // console.log("TCL: ViewSignedDoc -> renderSignOnPosition -> pageDetails", pageDetails)
     return this.state.signLogs.map((signLog) => {
       let pageRatio = signLog.pageRatio.split(',')
       let left = ((parseFloat(pageRatio[0]) * parseFloat(pageDetails.pageWidth)) + parseInt(aboutPage[signLog.pageNo - 1].pageLeft));
@@ -231,6 +230,38 @@ class ViewSignedDoc extends Component {
     })
   }
 
+  onDownloadDoc = () => {
+    const { signLogs, signatureDetails, documentDetails, docSignIds } = this.state;
+    return new Promise((resolve, reject) => {
+      axios.post(`${baseUrl}/document/download`, { signLogs, signatureDetails, documentDetails, docSignIds })
+        .then((response) => {
+          if (response.data) {
+            const xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+              var a;
+              if (xhttp.readyState === 4 && xhttp.status === 200) {
+                a = document.createElement('a');
+                a.href = window.URL.createObjectURL(xhttp.response);
+                a.download = response.data.file;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                toastSuccess("Document Downloading Is Started ");
+              }
+            };
+            xhttp.open("GET", `http://192.168.1.49:8000/document/download/${response.data.file}`);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            xhttp.responseType = 'blob';
+            xhttp.send();
+            resolve();
+          }
+        })
+        .catch((error) => {
+          reject(error)
+        });
+    });
+  }
+
   render() {
     const { imagePreviewUrl, documentDetails, signLogs, aboutPage, isLoading, docSignStatus } = this.state;
     return (
@@ -245,7 +276,7 @@ class ViewSignedDoc extends Component {
                       <Label size="sm" className='align text-white text-uppercase m-0'>- Download Document :</Label>
                     </div>
                     <div className="mr-3">
-                      <Button color="success" id="btnFinalDocSignature" disabled onClick={() => { }}>Download Document</Button>
+                      <Button color="success" id="btnFinalDocSignature" disabled={!docSignStatus} onClick={this.onDownloadDoc}>Download Document</Button>
                     </div>
                   </div>
                 </Col>

@@ -244,17 +244,13 @@ class DoSign extends Component {
   //     { pageNo: 1, signCoord: "228.95714285714286", id: 116 },
   //     { pageNo: 2, signCoord: "99.7222222222222", id: 117 },
   //   ];
-  // console.log("TCL: testingSort -> signLogs.sort(SortArrayWithMultiVal('PageNo'))", signLogs.sort(SortArrayWithMultiVal("pageNo", "signCoord")))
+  //   console.log("TCL: testingSort -> signLogs.sort(SortArrayWithMultiVal('PageNo'))", signLogs.sort(SortArrayWithMultiVal("pageNo", "signCoord")))
   // }
 
   onSetSign = (event) => {
     let { recipientDetails, signLogs, signatureDetails, signCounter } = { ...this.state };
     let signLogId = parseInt(event.target.id.substring(1));
     if (recipientDetails.signImg) {
-      if (signCounter === signLogs.length) {
-        toastSuccess('All Signs Complete.!');
-        return '';
-      }
       signLogs = this.state.signLogs.map((obj) => {
         if (obj.id === signLogId) {
           if (obj.signId) {
@@ -285,7 +281,7 @@ class DoSign extends Component {
 
   renderSignOnPosition = () => {
     let { aboutPage, pageDetails, recipientDetails } = { ...this.state }
-    // console.log("TCL: DoSign -> renderSignOnPosition -> pageDetails", pageDetails)
+    console.log("TCL: DoSign -> renderSignOnPosition -> pageDetails", pageDetails)
     return this.state.signLogs.map((signLog) => {
       let pageRatio = signLog.pageRatio.split(',')
       let left = ((parseFloat(pageRatio[0]) * parseFloat(pageDetails.pageWidth)) + parseInt(aboutPage[signLog.pageNo - 1].pageLeft));
@@ -367,7 +363,7 @@ class DoSign extends Component {
                     </div>
                     <div className="mr-3">
                       {
-                        <Button color="success" id="btnFinalDocSignature" disabled={(signCounter === signLogs.length) ? true : false} onClick={this.onFinalSignatureClick}>Finish Signature</Button>
+                        <Button color="success" id="btnFinalDocSignature" disabled={(signCounter === signLogs.length) ? false : true} onClick={this.onFinalSignatureClick}>Finish Signature</Button>
                       }
                     </div>
                   </div>
