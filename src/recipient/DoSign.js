@@ -140,8 +140,6 @@ class DoSign extends Component {
   }
 
   onLoadPdf = () => {
-    // this.testingSort();
-    //document.getElementById(nextSibling.id).scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" })
     let { signCounter, imagePreviewUrl, docId, docSignId, documentDetails, signLogs, isLoading, recipientDetails, signatureDetails, isSignSet, creatorDetails } = { ...this.state }
     const token = queryString.parse(this.props.location.search).token;
     this.getDocSignDetails(token).then(docSignData => {
@@ -237,16 +235,6 @@ class DoSign extends Component {
     }
   }
 
-  // testingSort = () => {
-  //   var signLogs = [
-  //     { pageNo: 1, signCoord: "565.6666666666666", id: 114 },
-  //     { pageNo: 2, signCoord: "59.985714285714266", id: 115 },
-  //     { pageNo: 1, signCoord: "228.95714285714286", id: 116 },
-  //     { pageNo: 2, signCoord: "99.7222222222222", id: 117 },
-  //   ];
-  //   console.log("TCL: testingSort -> signLogs.sort(SortArrayWithMultiVal('PageNo'))", signLogs.sort(SortArrayWithMultiVal("pageNo", "signCoord")))
-  // }
-
   onSetSign = (event) => {
     let { recipientDetails, signLogs, signatureDetails, signCounter } = { ...this.state };
     let signLogId = parseInt(event.target.id.substring(1));
@@ -281,7 +269,7 @@ class DoSign extends Component {
 
   renderSignOnPosition = () => {
     let { aboutPage, pageDetails, recipientDetails } = { ...this.state }
-    console.log("TCL: DoSign -> renderSignOnPosition -> pageDetails", pageDetails)
+    // console.log("TCL: DoSign -> renderSignOnPosition -> pageDetails", pageDetails)
     return this.state.signLogs.map((signLog) => {
       let pageRatio = signLog.pageRatio.split(',')
       let left = ((parseFloat(pageRatio[0]) * parseFloat(pageDetails.pageWidth)) + parseInt(aboutPage[signLog.pageNo - 1].pageLeft));
