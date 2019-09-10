@@ -187,7 +187,18 @@ class SetSign extends Component {
   }
 
   setImages = () => {
-    return this.state.imagePreviewUrl.map((img, index) => <div key={index + 1} className='d-flex mt-3 bg-white'><img width={"100%"} className={"pdfpage"} id={'pg-' + (index + 1)} onLoadCapture={this.onPageLoad} onDragEnter={this.onDragOverCaptureImage} src={'http://192.168.1.49:8000/upload/' + img} alt={index + 1} /></div>);
+    return this.state.imagePreviewUrl.map((img, index) => {
+      return <div key={index + 1} className='d-flex mt-3 bg-white'>
+        <img
+          width={"100%"}
+          className={"pdfpage"}
+          id={'pg-' + (index + 1)}
+          onLoadCapture={this.onPageLoad}
+          onDragEnter={this.onDragOverCaptureImage}
+          src={'http://192.168.1.49:8000/upload/' + img}
+          alt={index + 1} />
+      </div>
+    });
   }
 
   render() {

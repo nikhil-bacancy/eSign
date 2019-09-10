@@ -185,7 +185,7 @@ class ViewSignedDoc extends Component {
 
   setImages = () => {
     return this.state.imagePreviewUrl.map((img, index) => {
-      return <div key={index + 1} className='d-flex m-3 bg-white'>
+      return <div key={index + 1} className='d-flex m-3 bg-white justify-content-center'>
         <img
           width={"100%"}
           className={"pdfpage"}
