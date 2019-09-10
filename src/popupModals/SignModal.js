@@ -24,8 +24,6 @@ class SignModal extends React.Component {
 
 	componentDidUpdate = (prevProps) => {
 		if (prevProps.open !== this.props.open) {
-			console.log("etfsdfsdg"
-			)
 			this.setState({
 				isSignChange: !this.props.open,
 				signImg: this.props.signatureUrl,
@@ -135,7 +133,7 @@ class SignModal extends React.Component {
 									<TabContent activeTab={activeTab}>
 										<TabPane tabId="1">
 											<div className={"sigContainer"}>
-												<SignatureCanvas ref={(ref) => { this.sigPad = ref }} penColor='black' canvasProps={{ className: "sigPad" }} clearOnResize={false} />
+												<SignatureCanvas ref={(ref) => { this.sigPad = ref }} penColor='black' canvasProps={{ width: 500, height: 150, className: "sigPad" }} clearOnResize={false} />
 											</div>
 											<div>
 												<Button color="warning" onClick={this.clear}>Clear</Button>{' '}

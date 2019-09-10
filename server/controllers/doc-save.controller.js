@@ -42,17 +42,21 @@ exports.saveDoc = function (req, res) {
     if (req.body) {
       // signLogs, signatureDetails, documentDetails, docSignIds
       const pageConfig = req.body.signLogs.map(signLogObj => {
+        if (signLogObj.signId) {
+          const index = req.body.signatureDetails.findIndex((objSign) => parseInt(objSign.id) === parseInt(signLogObj.signId));
+          signPath = `${uploadedFilePath}signatures/${req.body.signatureDetails[index].name}`;
+        }
         return {
           PAGE_NUM: signLogObj.pageNo,
           SIGN_POSX: parseFloat(signLogObj.signCoord.split(',')[0]),
           SIGN_POSY: parseFloat(signLogObj.signCoord.split(',')[1]),
           PAGE_RATIO_X: parseFloat(signLogObj.pageRatio.split(',')[0]),
           PAGE_RATIO_Y: parseFloat(signLogObj.pageRatio.split(',')[1]),
-          SIGN_PNG: uploadedFilePath + 'signatures/' + req.body.signatureDetails[0].name,
+          SIGN_PNG: signPath,
         }
       });
 
-      const PDF_DOC = (uploadedFilePath + req.body.documentDetails.name).toString();
+      const PDF_DOC = (uploadedFilePath + req.body.documentDetails.name)
       DocModifier.modifyPDF(pageConfig, PDF_DOC).then(resFile => {
         return res.status(200).json({
           status: true,
