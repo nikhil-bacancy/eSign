@@ -150,40 +150,12 @@ exports.getPdfImageUrls = async (req, res) => {
 
   if (docData) {
     let pdfPath = docData.path + docData.name;
-    // const PDF2Pic = require("pdf2pic");
-
-    // const pdf2pic = new PDF2Pic({
-    //   density: 100,           // output pixels per inch
-    //   savename: docData.name,   // output file name
-    //   savedir: docData.path,    // output file location
-    //   format: "png",          // output file format
-    //   size: "600x600"         // output size in pixels
-    // });
-
-    // pdf2pic.convertToBase64(pdfPath).then((resolve) => {
-    //   console.log("TCL: exports.getPdfImageUrls -> resolve", resolve)
-    //   console.log("image converter successfully!");
-    //   return res.status(200).json({
-    //     status: true,
-    //     message: 'pdf fetched successfully.',
-    //     data: resolve,
-    //   });
-    // }).catch(err => {
-    //   console.log("TCL: exports.getPdfImageUrls -> err", err)
-    //   return res.status(500).json({
-    //     status: false,
-    //     message: 'Internal server error',
-    //     details: err,
-    //   });
-    // });
 
     let PDFImage = require("pdf-image").PDFImage;
     let pdfImage = new PDFImage(pdfPath, {
       convertOptions: {
-        "-auto-gamma": true,
-        "-auto-level": true,
-        "-auto-orient": true,
-        "-quality": "100"
+        "-density": 300,
+        "-trim": null,
       }
     });
 

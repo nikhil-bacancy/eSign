@@ -174,7 +174,24 @@ class FileUpload extends Component {
                   <Document
                     file={sender.docFile}
                     onLoadSuccess={this.onDocumentLoadSuccess} >
-                    <Page pageNumber={pageNumber} />
+                    {Array.from(
+                      new Array(sender.totalPages),
+                      (el, index) => (
+                        <Page
+                          key={`page_${index + 1}`}
+                          pageNumber={index + 1}
+                          width={1200}
+                          height={900}
+                          onLoadSuccess={(e) => {
+                            console.log('onLoadSuccess', e);
+                          }}
+                          onRenderSuccess={(e) => {
+                            console.log('onLoadSuccess', e);
+                          }}
+                        />
+                      ),
+                    )}
+                    {/* <Page pageNumber={pageNumber} width={1200} height={900} /> */}
                   </Document>
                   <p>Page {pageNumber} of {sender.totalPages}</p>
                 </div>
