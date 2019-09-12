@@ -195,7 +195,7 @@ class SetSign extends Component {
           id={'pg-' + (index + 1)}
           onLoadCapture={this.onPageLoad}
           onDragEnter={this.onDragOverCaptureImage}
-          src={'http://192.168.1.49:8000/upload/' + img}
+          src={`${baseUrl}/upload/` + img}
           alt={index + 1} />
       </div>
     });

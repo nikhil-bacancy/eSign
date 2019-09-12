@@ -206,7 +206,7 @@ class DoSign extends Component {
           className={"pdfpage"}
           id={'pg-' + (index + 1)}
           onLoadCapture={this.onLoadCaptureImage}
-          src={'http://192.168.1.49:8000/upload/' + img}
+          src={`${baseUrl}/upload/` + img}
           alt={index + 1} />
       </div>
     });
