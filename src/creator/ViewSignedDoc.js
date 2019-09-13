@@ -249,7 +249,7 @@ class ViewSignedDoc extends Component {
                 toastSuccess("Document Downloading Is Started ");
               }
             };
-            xhttp.open("GET", `http://192.168.1.49:8000/document/download/${response.data.file}`);
+            xhttp.open("GET", `${baseUrl}/document/download/${response.data.file}`);
             xhttp.setRequestHeader("Content-Type", "application/json");
             xhttp.responseType = 'blob';
             xhttp.send();
