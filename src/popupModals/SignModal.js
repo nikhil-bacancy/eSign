@@ -2,7 +2,7 @@ import React from 'react';
 import {
 	TabContent, TabPane,
 	Nav, NavItem, NavLink,
-	Button, Form, FormGroup, Row, Col, Label,
+	Input, Button, Form, FormGroup, Row, Col, Label,
 	Modal, ModalBody, ModalFooter, ModalHeader
 } from 'reactstrap';
 import SignatureCanvas from 'react-signature-canvas';
@@ -10,7 +10,8 @@ import './signModal.css'
 import classnames from 'classnames';
 import SignatureUpload from "../utils/dragNdropFileupload";
 import { toastError } from "../NotificationToast";
-
+import sampleSign from './sampleSign.png';
+import Avatar from 'avatar-initials';
 class SignModal extends React.Component {
 	constructor(props) {
 		super(props);
@@ -27,6 +28,29 @@ class SignModal extends React.Component {
 			this.setState({
 				isSignChange: !this.props.open,
 				signImg: this.props.signatureUrl,
+			});
+		}
+		// var name = 'Foo Bar 1Name too Long';
+		// var initials = name.match(/\b\w/g) || [];
+		// initials = ((initials.shift() || '') + (initials.pop() || '')).toUpperCase();
+
+		if (document.getElementById('avatarInitital')) {
+			const avatarFullName = new Avatar(document.getElementById('avatarFullName'), {
+				'useGravatar': false,
+				'initials': 'Nikhil Patel',
+				'initial_fg': 'black',
+				'initial_size': 40,
+				'initial_bg': '#ffffff00', // Transperent Background Color
+				'initial_font_family': "'Tangerine', cursive",
+			});
+
+			const avatarInitital = new Avatar(document.getElementById('avatarInitital'), {
+				'useGravatar': false,
+				'initials': 'NP',
+				'initial_fg': 'black',
+				'initial_size': 40,
+				'initial_bg': '#ffffff00', // Transperent Background Color
+				'initial_font_family': "'Tangerine', cursive",
 			});
 		}
 
@@ -90,24 +114,26 @@ class SignModal extends React.Component {
 		const { signImg, isSignChange, activeTab } = this.state;
 		return (
 			<div>
+
 				<Modal size={"md"} isOpen={this.props.open}>
 					<ModalHeader toggle={this.props.toggle}	>Signature Selection</ModalHeader>
 					<ModalBody style={{ backgroundColor: "whitesmoke" }}>
 						<Form>
-							{/* <Row>
+							<Row>
 								<Col md={6}>
 									<FormGroup>
 										<Label for="exampleFullname">Full Name</Label>
-										<Input type="text" name="fullName" id="exampleFullname" placeholder="Your Full Name Here." />
+										<Input type="text" name="fullName" id="exampleFullname" placeholder="Enter Name" />
 									</FormGroup>
 								</Col>
 								<Col md={6}>
 									<FormGroup>
 										<Label for="exampleInitial">Initials</Label>
-										<Input type="text" name="initial" id="exampleInitial" placeholder="Initial As Per Fullname" />
+										<Input type="text" name="initial" id="exampleInitial" placeholder="Enter Initial" />
 									</FormGroup>
 								</Col>
-							</Row> */}
+							</Row>
+							<hr />
 							<Row>
 								<Col md={12} >
 									<Nav tabs>
@@ -124,6 +150,13 @@ class SignModal extends React.Component {
 												className={classnames({ active: activeTab === "2" })}
 												onClick={() => { this.toggleTabs("2"); }}
 											>UPLOAD</NavLink>
+										</NavItem>
+										<NavItem>
+											<NavLink
+												style={{ cursor: "pointer" }}
+												className={classnames({ active: activeTab === "3" })}
+												onClick={() => { this.toggleTabs("3"); }}
+											>CHOOSE</NavLink>
 										</NavItem>
 									</Nav>
 								</Col>
@@ -146,6 +179,23 @@ class SignModal extends React.Component {
 													<SignatureUpload onFileDrop={this.onFileDrop} showFileMeta={false} />
 												</Col>
 											</Row>
+										</TabPane>
+										<TabPane tabId="3">
+											<div className={"chooseContainer"}>
+												<div class="d-flex bg-white border rounded boxshadowEffect1">
+													<div class="flex-shrink-1 align-self-center">
+														<FormGroup check inline className="pl-2">
+															<Input type="radio" name="finalizedrecipients" value={''} />
+														</FormGroup>
+													</div>
+													<div class="w-100">
+														<img src={sampleSign} id="avatarFullName" width={300} height={50} alt='nothing' />
+													</div>
+													<div class="flex-shrink-1">
+														<img src={sampleSign} id="avatarInitital" width={100} height={50} alt='nothing' />
+													</div>
+												</div>
+											</div>
 										</TabPane>
 									</TabContent>
 								</Col>

@@ -14,3 +14,15 @@
 .pdf {
   width: fit-content;
 }
+/* 
+@font-face {
+    font-family: 'Signerica';
+    src: url('./fonts/signerica/SignericaMedium.eot');
+    src: url('./fonts/signerica/SignericaMedium.eot?#iefix') format('embedded-opentype'),
+        url('./fonts/signerica/SignericaMedium.woff2') format('woff2'),
+        url('./fonts/signerica/SignericaMedium.woff') format('woff'),
+        url('./fonts/signerica/SignericaMedium.ttf') format('truetype'),
+        url('./fonts/signerica/SignericaMedium.svg#SignericaMedium') format('svg');
+    font-weight: 500;
+    font-style: normal;
+} */

@@ -182,12 +182,6 @@ class FileUpload extends Component {
                           pageNumber={index + 1}
                           width={1200}
                           height={900}
-                          onLoadSuccess={(e) => {
-                            console.log('onLoadSuccess', e);
-                          }}
-                          onRenderSuccess={(e) => {
-                            console.log('onLoadSuccess', e);
-                          }}
                         />
                       ),
                     )}
