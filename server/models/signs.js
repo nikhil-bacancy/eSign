@@ -3,6 +3,8 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     name: DataTypes.TEXT,
     path: DataTypes.TEXT,
+    initialName: DataTypes.TEXT,
+    initialPath: DataTypes.TEXT,
     isDefault: DataTypes.BOOLEAN,
   }, {});
   signs.associate = function (models) {

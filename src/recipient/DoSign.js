@@ -24,6 +24,7 @@ class DoSign extends Component {
         pageWidth: null
       },
       signatureUrl: null,
+      initialUrl: null,
       signCounter: 0,
       open: false,
       isSignSet: false,
@@ -67,7 +68,7 @@ class DoSign extends Component {
           recipientDetails = {
             id: response.data.data.recipientId,
             email: response.data.data.recipient.email,
-            name: response.data.data.recipient.name
+            name: response.data.data.recipient.name,
           }
           creatorDetails = {
             id: response.data.data.creatorId,
@@ -157,6 +158,7 @@ class DoSign extends Component {
           this.getSignature(recipientDetails.email).then(signatureData => {
             signatureDetails = signatureData;
             recipientDetails.signImg = `${baseUrl}/upload/signatures/${signatureData.name}`;
+            recipientDetails.initialImg = `${baseUrl}/upload/signatures/initials/${signatureData.initialName}`;
             isSignSet = true;
             this.setState({
               signCounter, isSignSet, signatureDetails,
@@ -295,14 +297,15 @@ class DoSign extends Component {
     this.setState(({ open }) => ({ open: !open }));
   }
 
-  onUploadSign = (signatureUrl) => {
+  onUploadSign = (signatureUrl, initialUrl) => {
     let { recipientDetails, open, signatureDetails } = { ...this.state };
     recipientDetails.signImg = signatureUrl;
-    if (recipientDetails.signImg) {
+    recipientDetails.initialImg = initialUrl;
+    if (recipientDetails.signImg && recipientDetails.initialImg) {
       axios.post(`${baseUrl}/uploadsign/`, this.formdataCoverter(recipientDetails))
         .then((response) => {
           signatureDetails = response.data.data;
-          this.setState({ signatureDetails, isSignSet: true, signatureUrl, recipientDetails, open: !open })
+          this.setState({ signatureDetails, isSignSet: true, signatureUrl, initialUrl, recipientDetails, open: !open })
           toastSuccess(response.data.message);
         })
         .catch((error) => {
@@ -325,10 +328,10 @@ class DoSign extends Component {
   }
 
   render() {
-    const { imagePreviewUrl, documentDetails, signLogs, aboutPage, isLoading, isSignSet, recipientDetails, signatureUrl, signCounter } = this.state;
+    const { imagePreviewUrl, documentDetails, signLogs, aboutPage, isLoading, isSignSet, recipientDetails, signatureUrl, initialUrl, signCounter } = this.state;
     return (
       <>
-        <SignModal toggle={this.toggle} open={this.state.open} signatureUrl={signatureUrl} onUploadSign={this.onUploadSign} />
+        <SignModal toggle={this.toggle} userDetails={recipientDetails} open={this.state.open} initialUrl={initialUrl} signatureUrl={signatureUrl} onUploadSign={this.onUploadSign} />
         <Form className='mx-5' id='setsignForm'>
           {documentDetails !== null &&
             <>
@@ -340,6 +343,9 @@ class DoSign extends Component {
                     </div>
                     <div className="mr-3">
                       <div className="bg-white"><img src={recipientDetails.signImg ? recipientDetails.signImg : signImg} width={recipientDetails.signImg ? "140px" : "55px"} height="45px" alt="not found" /></div>
+                    </div>
+                    <div className="mr-3">
+                      <div className="bg-white"><img src={recipientDetails.initialImg ? recipientDetails.initialImg : signImg} width={recipientDetails.initialImg ? "80px" : "55px"} height="45px" alt="not found" /></div>
                     </div>
                     <div className="mr-3">
                       {

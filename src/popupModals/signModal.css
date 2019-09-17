@@ -1,14 +1,17 @@
 
 .sigContainer {
-  width: 100%;
-  height: 100%;
   margin: .5rem 0 .5rem 0;
-  background-color:antiquewhite;
+  padding-left: unset !important;
 }
-
+.sigInitialContainer {
+  margin: .5rem 0 .5rem 0;
+  padding-left: unset !important;
+  padding-right: unset !important;
+}
 .sigPad {
   width: 100%;
   height: 100%;
+  background-color:antiquewhite;
 }
 
 .sigImage {
@@ -18,10 +21,16 @@
   background-color: white;
 }
 
+.initialImage {
+  background-size: 90px 50px;
+  width: 90px;
+  height: 50px;
+  background-color: white;
+}
+
 .chooseContainer {
-  width: 100%;
-  height: 100%;
-  padding: .5rem;
+  margin: .5rem 0 0 0;
+  padding: .5rem 0 .5rem 0 !important;
  background-color: aliceblue;
 }
 .boxshadowEffect1{
