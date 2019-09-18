@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Dropzone from 'react-dropzone';
 import "./dragNdrop.css";
 import { Button } from 'reactstrap';
-
+import { toastError } from "../NotificationToast";
 class dragNdropFileupload extends Component {
     constructor() {
         super();
@@ -11,9 +11,29 @@ class dragNdropFileupload extends Component {
         };
     }
 
-    onDrop = (files) => {
-        this.setState({ files })
-        this.props.onFileDrop(files[0]);
+    onDrop = (acceptedFiles, rejectedFiles, event) => {
+        this.setState({ acceptedFiles })
+        if (this.props.isMultiple) {
+
+        } else {
+            const promise = new Promise((resolve, reject) => {
+                const reader = new FileReader()
+                reader.readAsDataURL(acceptedFiles[0])
+                reader.onload = () => {
+                    if (!!reader.result) {
+                        resolve(reader.result)
+                    }
+                    else {
+                        reject(Error("Failed converting to base64"))
+                    }
+                }
+            })
+            promise.then(result => {
+                this.props.onFileDrop(result, event);
+            }, err => {
+                toastError("Invalid Image")
+            })
+        }
     };
 
     render() {
@@ -24,7 +44,7 @@ class dragNdropFileupload extends Component {
         ));
 
         return (
-            <Dropzone onDrop={this.onDrop} accept={'image/png'} noClick={true} multiple={false} maxSize={1000000}>
+            <Dropzone onDrop={this.onDrop} accept={'image/png'} noClick={true} multiple={this.props.isMultiple} maxSize={1000000}>
                 {({ getRootProps, getInputProps, isDragAccept, isDragReject, isDragActive, open }) => (
                     <section>
                         <div {...getRootProps({
@@ -33,10 +53,12 @@ class dragNdropFileupload extends Component {
                                     isDragAccept ? 'acceptStyle baseStyle' : isDragReject ? 'rejectStyle baseStyle' : 'activeStyle baseStyle'
                                     : 'baseStyle'
                         })}>
-                            <input {...getInputProps()} />
-                            <p>Drag 'n' drop some files here, or click to select files</p>
-                            <Button color="primary mb-3" size="sm" onClick={open} >Open File Dialog</Button>
-                            <em>(Only *.png images will be accepted)</em>
+                            <input name={this.props.name} {...getInputProps()} />
+                            <center>
+                                <p className={(this.props.boxSize === 'small') ? 'small' : ''}>Drag 'n' drop files here /</p>
+                                <Button color="primary mb-3 d-block" size="sm" onClick={open} >{this.props.uploadFor}</Button>
+                                {(this.props.isInsideText) && <em className={(this.props.boxSize === 'small') ? 'small' : ''}>(Allowed File Type : *.png)</em>}
+                            </center>
                         </div>
                         {this.props.showFileMeta &&
                             < aside >

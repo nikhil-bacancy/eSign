@@ -12,10 +12,10 @@ const Signswithinitials = (props) => {
                 </FormGroup>
             </Col>
             <Col xs="8">
-                <img src={props.sampleSign} id={`avatarFullName${index + 1}`} width={300} height={50} alt='nothing' />
+                <img src={props.sampleSign} id={`avatarFullName${index + 1}`} style={{ objectFit: 'contain' }} width={300} height={50} alt='nothing' />
             </Col>
             <Col xs="3">
-                <img src={props.sampleSign} id={`avatarInitital${index + 1}`} width={90} height={50} alt='nothing' />
+                <img src={props.sampleSign} id={`avatarInitital${index + 1}`} style={{ objectFit: 'contain' }} width={90} height={50} alt='nothing' />
             </Col>
         </Row>)
     }

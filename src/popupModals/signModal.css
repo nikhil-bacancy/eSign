@@ -2,15 +2,17 @@
 .sigContainer {
   margin: .5rem 0 .5rem 0;
   padding-left: unset !important;
+  height: 100% !important;
 }
 .sigInitialContainer {
   margin: .5rem 0 .5rem 0;
+  height: 100% !important;
   padding-left: unset !important;
   padding-right: unset !important;
 }
 .sigPad {
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
   background-color:antiquewhite;
 }
 

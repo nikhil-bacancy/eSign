@@ -53,9 +53,10 @@ class SignModal extends React.Component {
 				let avatarFullName = `avatarFullName${index + 1}`;
 				new Avatar(document.getElementById(avatarFullName), {
 					'useGravatar': false,
-					'initials': userDetails.name,
+					'initials': 'BacancyVam Technology',//userDetails.name,
 					'initial_fg': 'black',
 					'initial_size': 30,
+					'size': 80,
 					'initial_bg': '#ffffff00',
 					'initial_font_family': font_family_List[index],
 				});
@@ -65,6 +66,7 @@ class SignModal extends React.Component {
 					'initials': userDetails.initials,
 					'initial_fg': 'black',
 					'initial_size': 30,
+					'size': 80,
 					'initial_bg': '#ffffff00',
 					'initial_font_family': font_family_List[index],
 				});
@@ -103,11 +105,11 @@ class SignModal extends React.Component {
 		}
 	}
 
-	clear = () => {
+	clearSign = () => {
 		this.sigPad.clear()
 	}
 
-	trim = () => {
+	trimSign = () => {
 		if (this.sigPad.isEmpty()) {
 			toastError("Please Draw Signature.!");
 		} else {
@@ -118,27 +120,34 @@ class SignModal extends React.Component {
 		}
 	}
 
-	onFileDrop = (file) => {
-		const promise = new Promise((resolve, reject) => {
-			const reader = new FileReader()
-			reader.readAsDataURL(file)
-			reader.onload = () => {
-				if (!!reader.result) {
-					resolve(reader.result)
-				}
-				else {
-					reject(Error("Failed converting to base64"))
-				}
-			}
-		})
-		promise.then(result => {
+	clearInitial = () => {
+		this.sigInitialPad.clear()
+	}
+
+	trimInitial = () => {
+		if (this.sigInitialPad.isEmpty()) {
+			toastError("Please Draw Initial.!");
+		} else {
 			this.setState({
-				isSignChange: true,
-				signImg: result,
+				initialImg: this.sigInitialPad.getTrimmedCanvas().toDataURL('image/png'),
+				isInitialChange: true,
 			})
-		}, err => {
-			toastError("Invalid Image")
-		})
+		}
+	}
+
+	onFileDrop = (acceptedFiles, event) => {
+		let { signImg, initialImg, isSignChange, isInitialChange } = { ...this.state };
+		if (event.target.name === 'signUpload') {
+			signImg = acceptedFiles; isSignChange = true;
+		} else if (event.target.name === 'initialUpload') {
+			initialImg = acceptedFiles; isInitialChange = true;
+		}
+		this.setState({
+			signImg,
+			initialImg,
+			isSignChange,
+			isInitialChange
+		});
 	}
 
 	onCheckChanged = (event) => {
@@ -210,21 +219,33 @@ class SignModal extends React.Component {
 										<TabPane tabId="1">
 											<Row className={'m-0'}>
 												<Col sm="8" className={"sigContainer"}>
-													<SignatureCanvas ref={(ref) => { this.sigPad = ref }} penColor='black' canvasProps={{ width: 300, height: 150, className: "sigPad" }} clearOnResize={false} />
+													<Label readOnly>Signature</Label>
+													<SignatureCanvas ref={(ref) => { this.sigPad = ref }} penColor='black' canvasProps={{ width: '300', height: '150', className: "sigPad" }} clearOnResize={false} />
 												</Col>
 												<Col sm="4" className={"sigInitialContainer"}>
-													<SignatureCanvas ref={(ref) => { this.sigInitialPad = ref }} penColor='black' canvasProps={{ width: 200, height: 150, className: "sigPad" }} clearOnResize={false} />
+													<Label readOnly >Initials</Label>
+													<SignatureCanvas ref={(ref) => { this.sigInitialPad = ref }} penColor='black' canvasProps={{ width: '150', height: '150', className: "sigPad" }} clearOnResize={false} />
 												</Col>
 											</Row>
-											<div>
-												<Button color="warning" onClick={this.clear}>Clear</Button>{' '}
-												<Button color="primary" onClick={this.trim}>Apply</Button>{' '}
-											</div>
+											<Row className={'m-0'}>
+												<Col sm="8" className={'p-0'}>
+													<Button color="warning" onClick={this.clearSign}>Clear</Button>{' '}
+													<Button color="primary" onClick={this.trimSign}>Apply</Button>{' '}
+												</Col>
+												<Col sm="4" className={'p-0'}>
+													<Button color="warning" onClick={this.clearInitial}>Clear</Button>{' '}
+													<Button color="primary" onClick={this.trimInitial}>Apply</Button>{' '}
+												</Col>
+											</Row>
 										</TabPane>
 										<TabPane tabId="2">
-											<Row>
-												<Col sm="12">
-													<SignatureUpload onFileDrop={this.onFileDrop} showFileMeta={false} />
+											<Row className={'m-0'}>
+												<Col sm="8" className={"sigContainer"}>
+													<SignatureUpload isInsideText={false} boxSize={'medium'} uploadFor={'Upload Signature'} isMultiple={false} onFileDrop={this.onFileDrop} name={'signUpload'} showFileMeta={false} />
+													<em className={'small'}>(Allowed File Type : *.png)</em>
+												</Col>
+												<Col sm="4" className={"sigInitialContainer"}>
+													<SignatureUpload isInsideText={false} boxSize={'small'} uploadFor={'Upload Initial'} isMultiple={false} onFileDrop={this.onFileDrop} name={'initialUpload'} showFileMeta={false} />
 												</Col>
 											</Row>
 										</TabPane>
@@ -232,10 +253,10 @@ class SignModal extends React.Component {
 											<Col className={"chooseContainer"}>
 												<Row className="m-1 d-flex align-items-center">
 													<Col xs="4"></Col>
-													<Col xs="6" className="align-self-center">
+													<Col xs="5" className="align-self-center">
 														<Label readOnly>Signature</Label>
 													</Col>
-													<Col xs="2">
+													<Col xs="3">
 														<Label readOnly >Initials</Label>
 													</Col>
 												</Row>
@@ -248,19 +269,20 @@ class SignModal extends React.Component {
 								</Col>
 							</Row>
 							{signImg ?
-								<Row>
-									<Col md={6} className={"pt-2"}>
+								<Row className={'m-0'}>
+									<Col sm={8} className={"p-0 pt-2"}>
 										<Label for="exampleInitial">Your Signature : </Label>
 										<FormGroup>
-											<img className={"sigImage border border-secondary"} alt="signature" src={signImg} />
+											<img className={"sigImage border border-secondary "} style={{ objectFit: 'contain' }} alt="signature" src={signImg} />
 										</FormGroup>
 									</Col>
-									<Col md={6} className={"pt-2"}>
-										<Label for="exampleInitial">Your Signature : </Label>
-										<FormGroup>
-											<img className={"initialImage border border-secondary"} alt="signature" src={initialImg} />
-										</FormGroup>
-									</Col>
+									{(initialImg) &&
+										<Col sm={4} className={"p-0 pt-2"}>
+											<Label for="exampleInitial">Your Initial : </Label>
+											<FormGroup>
+												<img className={"initialImage border border-secondary"} style={{ objectFit: 'contain' }} alt="signature" src={initialImg} />
+											</FormGroup>
+										</Col>}
 								</Row>
 								:
 								null
